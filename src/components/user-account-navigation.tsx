@@ -3,6 +3,8 @@
 import React from 'react'
 import Link from 'next/link'
 
+import { useSession } from '@/lib/providers/auth-store-provider'
+
 import Icons from '@/components/icons'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -23,6 +25,8 @@ interface UserAccountNavigationProps {
 }
 
 export default function UserAccountNavigation({ fallbackAvatar, fallbackAvatarClassName }: UserAccountNavigationProps) {
+	const session = useSession()
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -57,8 +61,15 @@ export default function UserAccountNavigation({ fallbackAvatar, fallbackAvatarCl
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem asChild variant="destructive">
-						<LogoutButton className="w-full" />
+					<DropdownMenuItem asChild variant={session !== null ? 'destructive' : 'default'}>
+						{session !== null ? (
+							<LogoutButton className="w-full" />
+						) : (
+							<Link href="/login">
+								<Icons.login className="size-4 text-primary" />
+								Log in
+							</Link>
+						)}
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
