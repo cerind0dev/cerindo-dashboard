@@ -6,9 +6,9 @@ import { redirect } from 'next/navigation'
 import { createServerValidate, ServerValidateError } from '@tanstack/react-form-nextjs'
 import z from 'zod'
 
+import { authFormOptions, authSchema } from '@/lib/features/auth/auth-validation'
 import { createClient } from '@/lib/supabase/server'
 import { getErrorMessage } from '@/lib/utils'
-import { authFormOptions, authSchema } from '@/lib/validations/auth'
 
 import type { Provider } from '@supabase/supabase-js'
 

@@ -7,7 +7,8 @@ import { env } from '@/env'
 
 import { inter } from '@/config/font'
 import { siteConfig } from '@/config/site'
-import { AuthStoreProvider } from '@/lib/providers/auth-store-provider'
+import { AuthStoreProvider } from '@/lib/features/auth/auth-store-provider'
+import QueryProvider from '@/lib/providers/query-provider'
 import { absoluteUrl } from '@/lib/utils'
 
 import { Toaster } from '@/components/ui/sonner'
@@ -88,7 +89,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 		<html lang="en" className={`${inter.className} h-full scroll-smooth`}>
 			<head />
 			<body className="h-full overscroll-none bg-background text-secondary-foreground">
-				<AuthStoreProvider>{children}</AuthStoreProvider>
+				<QueryProvider>
+					<AuthStoreProvider>{children}</AuthStoreProvider>
+				</QueryProvider>
 				<Toaster />
 			</body>
 		</html>

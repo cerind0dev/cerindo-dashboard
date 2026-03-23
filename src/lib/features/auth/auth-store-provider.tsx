@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation'
 
 import { useStore } from 'zustand'
 
-import { createAuthStore } from '@/lib/stores/auth-store'
+import { createAuthStore } from '@/lib/features/auth/auth-store'
 import { createClient } from '@/lib/supabase/client'
 
-import type { AuthStore } from '@/lib/stores/auth-store'
+import type { AuthStore } from '@/lib/features/auth/auth-store'
 
 export type AuthStoreApi = ReturnType<typeof createAuthStore>
 

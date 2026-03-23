@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { initialFormState, mergeForm, useForm, useStore, useTransform } from '@tanstack/react-form-nextjs'
 import { toast } from 'sonner'
 
-import { registerWithEmail } from '@/lib/actions/auth'
+import { registerWithEmail } from '@/lib/features/auth/auth-action'
+import { authFormOptions, authSchema } from '@/lib/features/auth/auth-validation'
 import { cn } from '@/lib/utils'
-import { authFormOptions, authSchema } from '@/lib/validations/auth'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'

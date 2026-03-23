@@ -2,7 +2,7 @@
 
 import React, { useTransition } from 'react'
 
-import { logInWithOAuth } from '@/lib/actions/auth'
+import { logInWithOAuth } from '@/lib/features/auth/auth-action'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'

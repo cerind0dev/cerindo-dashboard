@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { env } from '@/env'
 import { createServerClient } from '@supabase/ssr'
 
+import type { Database } from '@/types/database.types'
 import type { NextRequest } from 'next/server'
 
 const PROTECTED_ROUTES = ['/dashboard']
@@ -32,7 +33,7 @@ export async function updateSession(request: NextRequest) {
 		return supabaseResponse
 	}
 
-	const supabase = createServerClient(supabaseURL, supabasePublishableKey, {
+	const supabase = createServerClient<Database>(supabaseURL, supabasePublishableKey, {
 		cookies: {
 			getAll() {
 				return request.cookies.getAll()

@@ -2,7 +2,7 @@
 
 import React, { useTransition } from 'react'
 
-import { logOut } from '@/lib/actions/auth'
+import { logOut } from '@/lib/features/auth/auth-action'
 import { cn } from '@/lib/utils'
 
 import Icons from '@/components/icons'

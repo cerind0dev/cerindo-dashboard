@@ -5,8 +5,8 @@ import React, { useActionState, useEffect } from 'react'
 import { initialFormState, mergeForm, useForm, useStore, useTransform } from '@tanstack/react-form-nextjs'
 import { toast } from 'sonner'
 
-import { resendEmailRegistration } from '@/lib/actions/auth'
-import { authSchema } from '@/lib/validations/auth'
+import { resendEmailRegistration } from '@/lib/features/auth/auth-action'
+import { authSchema } from '@/lib/features/auth/auth-validation'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'

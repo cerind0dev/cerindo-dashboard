@@ -20,7 +20,7 @@ import {
 	SidebarRail,
 } from '@/components/ui/sidebar'
 
-import type { SidebarNavigationItem } from '@/types'
+import type { SidebarNavigationItem } from '@/types/index.types'
 
 export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const segments = useSelectedLayoutSegments()
@@ -62,9 +62,9 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
 			icon: 'wrench',
 			items: [
 				{
-					title: 'Pencarian AKL',
-					href: '/dashboard/search-akl',
-					active: segments.includes('search-akl'),
+					title: 'Pencarian Alkes',
+					href: '/dashboard/search-alkes',
+					active: segments.includes('search-alkes'),
 					icon: 'heartPulse',
 					items: [],
 				},

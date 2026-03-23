@@ -5,9 +5,9 @@ import React, { useActionState, useEffect, useState } from 'react'
 import { initialFormState, mergeForm, useForm, useStore, useTransform } from '@tanstack/react-form-nextjs'
 import { toast } from 'sonner'
 
-import { updatePassword } from '@/lib/actions/auth'
+import { updatePassword } from '@/lib/features/auth/auth-action'
+import { authSchema } from '@/lib/features/auth/auth-validation'
 import { cn } from '@/lib/utils'
-import { authSchema } from '@/lib/validations/auth'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'

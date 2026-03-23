@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-import { useSession } from '@/lib/providers/auth-store-provider'
+import { useSession } from '@/lib/features/auth/auth-store-provider'
 
 import Icons from '@/components/icons'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

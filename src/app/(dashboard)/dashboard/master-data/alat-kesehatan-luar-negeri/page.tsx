@@ -1,3 +1,3 @@
 import React from 'react'
 
-export default async function MasterDataAKLPage() {}
+export default async function MasterDataAlkesPage() {}

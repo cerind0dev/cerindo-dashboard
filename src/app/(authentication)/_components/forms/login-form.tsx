@@ -5,9 +5,9 @@ import Link from 'next/link'
 
 import { initialFormState, mergeForm, useForm, useTransform } from '@tanstack/react-form-nextjs'
 
-import { logInWithEmail } from '@/lib/actions/auth'
+import { logInWithEmail } from '@/lib/features/auth/auth-action'
+import { authFormOptions, authSchema } from '@/lib/features/auth/auth-validation'
 import { cn } from '@/lib/utils'
-import { authFormOptions, authSchema } from '@/lib/validations/auth'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
