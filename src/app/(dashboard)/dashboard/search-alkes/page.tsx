@@ -4,6 +4,8 @@ import { rubik } from '@/config/font'
 
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from '@/components/page-header'
 import AlkesSearchBar from '@/app/(dashboard)/_components/alkes-search-bar'
+import AlkesTable from '@/app/(dashboard)/_components/alkes-table'
+import AlkesTableFooter from '@/app/(dashboard)/_components/alkes-table-footer'
 
 export default async function SearchAlkesPage() {
 	return (
@@ -17,6 +19,8 @@ export default async function SearchAlkesPage() {
 					<AlkesSearchBar />
 				</div>
 			</div>
+			<AlkesTable />
+			<AlkesTableFooter />
 		</div>
 	)
 }

@@ -1,5 +1,6 @@
 import '@/styles/index.css'
 
+import { title } from 'process'
 import React from 'react'
 import { Metadata, Viewport } from 'next'
 
@@ -7,9 +8,10 @@ import { env } from '@/env'
 
 import { inter } from '@/config/font'
 import { siteConfig } from '@/config/site'
+import { AlkesStoreProvider } from '@/lib/features/alkes/alkes-store-provider'
 import { AuthStoreProvider } from '@/lib/features/auth/auth-store-provider'
 import QueryProvider from '@/lib/providers/query-provider'
-import { absoluteUrl } from '@/lib/utils'
+import { absoluteUrl } from '@/lib/utils/utils'
 
 import { Toaster } from '@/components/ui/sonner'
 
@@ -86,11 +88,12 @@ type RootLayoutProps = {
 
 export default async function RootLayout({ children }: RootLayoutProps) {
 	return (
-		<html lang="en" className={`${inter.className} h-full scroll-smooth`}>
-			<head />
+		<html lang="en" className={`${inter.className} font-rubi h-full scroll-smooth`}>
 			<body className="h-full overscroll-none bg-background text-secondary-foreground">
 				<QueryProvider>
-					<AuthStoreProvider>{children}</AuthStoreProvider>
+					<AuthStoreProvider>
+						<AlkesStoreProvider>{children}</AlkesStoreProvider>
+					</AuthStoreProvider>
 				</QueryProvider>
 				<Toaster />
 			</body>

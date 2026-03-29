@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 import { updatePassword } from '@/lib/features/auth/auth-action'
 import { authSchema } from '@/lib/features/auth/auth-validation'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/utils'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'

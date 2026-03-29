@@ -3,7 +3,7 @@
 import React from 'react'
 
 import { useScroll } from '@/lib/hooks/use-scroll'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/utils'
 
 import Logo from '@/components/logo'
 import UserAccountNavigation from '@/components/user-account-navigation'

@@ -21,10 +21,10 @@ export default async function DashboardRootLayout({ children }: DashboardRootLay
 	}
 
 	return (
-		<SidebarProvider>
+		<SidebarProvider className="relative overflow-hidden">
 			<AppSidebar />
-			<SidebarInset>
-				<header className="sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+			<SidebarInset className="min-h-full">
+				<header className="sticky inset-x-0 top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
 					<div className="flex flex-1 items-center gap-2 px-3">
 						<SidebarTrigger />
 						<Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
@@ -33,7 +33,7 @@ export default async function DashboardRootLayout({ children }: DashboardRootLay
 						<UserAccountNavigation />
 					</div>
 				</header>
-				<div className="relative w-full bg-muted">{children}</div>
+				<div className="relative h-[calc(100vh-64px)] w-full bg-muted">{children}</div>
 			</SidebarInset>
 		</SidebarProvider>
 	)

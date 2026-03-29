@@ -7,7 +7,7 @@ import { initialFormState, mergeForm, useForm, useTransform } from '@tanstack/re
 
 import { logInWithEmail } from '@/lib/features/auth/auth-action'
 import { authFormOptions, authSchema } from '@/lib/features/auth/auth-validation'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/utils'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'

@@ -8,7 +8,7 @@ import z from 'zod'
 
 import { authFormOptions, authSchema } from '@/lib/features/auth/auth-validation'
 import { createClient } from '@/lib/supabase/server'
-import { getErrorMessage } from '@/lib/utils'
+import { getErrorMessage } from '@/lib/utils/utils'
 
 import type { Provider } from '@supabase/supabase-js'
 
