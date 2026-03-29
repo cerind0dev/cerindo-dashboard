@@ -56,7 +56,7 @@ export default function AlkesTableFooter() {
 				<span className="font-extrabold">{alkesItems.length}</span> barang dan{' '}
 				<span className="font-extrabold">{alkes.length}</span> izin AKL terpilih
 			</p>
-			<div className="block md:hidden">
+			<div className="block lg:hidden">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" size="icon" className="rounded-full">
@@ -66,29 +66,31 @@ export default function AlkesTableFooter() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-56" align="end" forceMount>
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<Icons.download className="mr-2 size-4 text-primary" />
+							<DropdownMenuItem onClick={() => handleExportAlkesToExcel()}>
+								<Icons.download className="size-4 text-primary" />
 								Export excel &#40;xlsx&#41;
 							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Icons.fileArchive className="mr-2 size-4 text-primary" />
+							<DropdownMenuItem onClick={() => handleExportAlkesToZip()}>
+								<Icons.fileArchive className="size-4 text-primary" />
 								Download AKL &#40;zip&#41;
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem variant="destructive">Reset tabel</DropdownMenuItem>
+							<DropdownMenuItem variant="destructive" onClick={() => clearAllAlkesItems()}>
+								Reset tabel
+							</DropdownMenuItem>
 						</DropdownMenuGroup>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-			<div className="hidden gap-2 md:flex md:items-center">
+			<div className="hidden gap-2 lg:flex lg:items-center">
 				<div className="flex items-center space-x-2">
 					<Button
 						variant="outline"
 						className="h-max px-2 py-1 text-[13px]"
 						disabled={isPending}
-						onClick={handleExportAlkesToExcel}
+						onClick={() => handleExportAlkesToExcel()}
 					>
 						{isPending && <Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />}
 						Export &#40;xlsx&#41;
@@ -97,7 +99,7 @@ export default function AlkesTableFooter() {
 						variant="outline"
 						className="h-max px-2 py-1 text-[13px]"
 						disabled={isPending}
-						onClick={handleExportAlkesToZip}
+						onClick={() => handleExportAlkesToZip()}
 					>
 						{isPending && <Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />}
 						Download &#40;zip&#41;
