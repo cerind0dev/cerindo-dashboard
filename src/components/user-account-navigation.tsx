@@ -19,32 +19,32 @@ import {
 } from '@/components/ui/dropdown-menu'
 import LogoutButton from '@/app/(authentication)/_components/logout-button'
 
-interface UserAccountNavigationProps {
-	fallbackAvatar?: React.ReactNode
-	fallbackAvatarClassName?: string
-}
-
-export default function UserAccountNavigation({ fallbackAvatar, fallbackAvatarClassName }: UserAccountNavigationProps) {
+export default function UserAccountNavigation() {
 	const session = useSession()
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="ghost" size="icon" className="rounded-full">
-					<Avatar>
-						<AvatarImage src="https://picsum.photos/200/200" alt="user profile picture" />
-						{fallbackAvatar && <AvatarFallback className={fallbackAvatarClassName}>{fallbackAvatar}</AvatarFallback>}
-					</Avatar>
+				<Button variant="default" size="icon" className="rounded-full">
+					{session !== null ? (
+						session.user.email!.split('@')[0].slice(0, 2).toUpperCase()
+					) : (
+						<Icons.userRound className="size-4" />
+					)}
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56" align="end">
-				<DropdownMenuLabel className="font-normal">
-					<div className="flex flex-col space-y-1">
-						<p>Signed in as</p>
-						<p className="mt-1.5 text-sm leading-none font-medium">user@email.com</p>
-					</div>
-				</DropdownMenuLabel>
-				<DropdownMenuSeparator />
+				{session && (
+					<React.Fragment>
+						<DropdownMenuLabel className="font-normal">
+							<div className="flex flex-col space-y-1">
+								<p>Signed in as</p>
+								<p className="mt-1.5 text-sm leading-none font-medium">{session.user.email!}</p>
+							</div>
+						</DropdownMenuLabel>
+						<DropdownMenuSeparator />
+					</React.Fragment>
+				)}
 				<DropdownMenuGroup>
 					<DropdownMenuItem asChild>
 						<Link href="/profile">
