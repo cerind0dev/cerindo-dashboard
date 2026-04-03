@@ -18,3 +18,19 @@ export function getAlkesItemsByTypeQuery(client: SupabaseClient<Database>, type:
 		)
 		.eq('type', type)
 }
+
+export function getAlkesByIdQuery(client: SupabaseClient<Database>, id: Tables<'alkes'>['id']) {
+	return client.from('alkes').select(
+		`id, brand_name, packaging, creation_date, expiry_date, file_url,
+      countries (
+        code, name
+      ),
+      hscode (
+        code, import_dutyfees, value_added_tax, income_tax_api, income_tax_non_api, lartas
+      ),
+      alkes_items (
+        
+      )
+    `,
+	)
+}
