@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 
-export default function AlkesTableFooter() {
+export default function SearchAlkesFooter() {
 	const [isPending, startTransition] = useTransition()
 	const pathname = usePathname()
 

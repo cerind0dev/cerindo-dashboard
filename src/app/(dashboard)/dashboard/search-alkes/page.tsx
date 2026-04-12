@@ -3,9 +3,9 @@ import React from 'react'
 import { rubik } from '@/config/font'
 
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from '@/components/page-header'
-import AlkesSearchBar from '@/app/(dashboard)/_components/alkes-search-bar'
-import AlkesTable from '@/app/(dashboard)/_components/alkes-table'
-import AlkesTableFooter from '@/app/(dashboard)/_components/alkes-table-footer'
+import SearchAlkesFooter from '@/app/(dashboard)/dashboard/search-alkes/_components/search-alkes-footer'
+import SearchAlkesSearchBar from '@/app/(dashboard)/dashboard/search-alkes/_components/search-alkes-search-bar'
+import SearchAlkesTable from '@/app/(dashboard)/dashboard/search-alkes/_components/search-alkes-table'
 
 export default async function SearchAlkesPage() {
 	return (
@@ -16,11 +16,11 @@ export default async function SearchAlkesPage() {
 					<PageHeaderDescription>Cari dan tinjau izin Alkes yang Anda butuhkan</PageHeaderDescription>
 				</PageHeader>
 				<div className="px-4">
-					<AlkesSearchBar />
+					<SearchAlkesSearchBar />
 				</div>
 			</div>
-			<AlkesTable />
-			<AlkesTableFooter />
+			<SearchAlkesTable />
+			<SearchAlkesFooter />
 		</div>
 	)
 }

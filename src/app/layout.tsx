@@ -1,10 +1,10 @@
 import '@/styles/index.css'
 
-import { title } from 'process'
 import React from 'react'
 import { Metadata, Viewport } from 'next'
 
 import { env } from '@/env'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 import { inter } from '@/config/font'
 import { siteConfig } from '@/config/site'
@@ -88,12 +88,14 @@ type RootLayoutProps = {
 
 export default async function RootLayout({ children }: RootLayoutProps) {
 	return (
-		<html lang="en" className={`${inter.className} font-rubi h-full scroll-smooth`}>
+		<html lang="en" className={`${inter.className} h-full scroll-smooth`}>
 			<body className="h-full overscroll-none bg-background text-secondary-foreground">
 				<QueryProvider>
-					<AuthStoreProvider>
-						<AlkesStoreProvider>{children}</AlkesStoreProvider>
-					</AuthStoreProvider>
+					<NuqsAdapter>
+						<AuthStoreProvider>
+							<AlkesStoreProvider>{children}</AlkesStoreProvider>
+						</AuthStoreProvider>
+					</NuqsAdapter>
 				</QueryProvider>
 				<Toaster />
 			</body>

@@ -6,6 +6,8 @@ import { flexRender } from '@tanstack/react-table'
 
 import { cn } from '@/lib/utils/utils'
 
+import Icons from '@/components/icons'
+import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -31,7 +33,44 @@ export function DataTableColumnHeader<TData, TValue>({
 	return <span className={cn(className)}>{title}</span>
 }
 
+interface DataTablePaginationProps<TData> {
+	table: TanstackTable<TData>
+}
+
+function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+	return (
+		<div className="flex items-center space-x-4">
+			<p className="text-sm">
+				Halaman {table.getState().pagination.pageIndex + 1} dari {table.getPageCount()}
+			</p>
+			<div className="flex items-center space-x-2">
+				<Button
+					aria-label="go to previous page"
+					variant="outline"
+					size="icon"
+					disabled={!table.getCanPreviousPage()}
+					onClick={() => table.previousPage()}
+				>
+					<Icons.chevronLeft className="size-4" />
+					<span className="sr-only">Go to previous page</span>
+				</Button>
+				<Button
+					aria-label="go to next page"
+					variant="outline"
+					size="icon"
+					disabled={!table.getCanNextPage()}
+					onClick={() => table.nextPage()}
+				>
+					<span className="sr-only">Go to next page</span>
+					<Icons.chevronRight className="size-4" />
+				</Button>
+			</div>
+		</div>
+	)
+}
+
 interface DataTableProps<TData> {
+	className?: string
 	table: TanstackTable<TData>
 	stickyHeader: boolean
 	emptyDataText: string
@@ -39,17 +78,29 @@ interface DataTableProps<TData> {
 }
 
 export function DataTable<TData>({
+	className,
 	table,
 	stickyHeader = false,
 	emptyDataText,
 	renderRowDetails,
 }: DataTableProps<TData>) {
 	return (
-		<Table>
-			<TableHeader className={cn(stickyHeader && 'sticky top-0 z-10')}>
+		<Table className={cn(className)}>
+			<TableHeader className={cn(stickyHeader && 'sticky top-0 z-10', 'shadow-sm [&_tr]:border-b-0')}>
+				{table.options.getPaginationRowModel !== undefined && (
+					<TableRow className="relative border-b-0">
+						<TableCell
+							scope="col"
+							colSpan={table.getAllColumns().length}
+							className="bg-white px-6 py-3 after:absolute after:bottom-0 after:left-0 after:w-full after:border-b after:border-border after:content-['']"
+						>
+							<DataTablePagination table={table} />
+						</TableCell>
+					</TableRow>
+				)}
 				{table.getHeaderGroups().map((headerGroup) => {
 					return (
-						<TableRow key={headerGroup.id}>
+						<TableRow key={headerGroup.id} className="border-b-0">
 							{headerGroup.headers.map((header) => {
 								return (
 									<TableHead
@@ -60,7 +111,7 @@ export function DataTable<TData>({
 											'relative bg-muted px-4 py-3',
 											header.column.columnDef.meta?.headerClassName ?? '',
 											stickyHeader &&
-												"before:absolute before:top-0 before:left-0 before:w-full before:border-t before:border-border before:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:border-b after:border-border after:content-['']",
+												"after:absolute after:bottom-0 after:left-0 after:w-full after:border-b after:border-border after:content-['']",
 										)}
 									>
 										{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}

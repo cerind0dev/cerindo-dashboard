@@ -18,9 +18,9 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import type { AlkesItem } from '@/lib/features/alkes/alkes.types'
+import type { AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 
-export default function AlkesSearchBar() {
+export default function SearchAlkesSearchBar() {
 	const [query, setQuery] = useState<string>('')
 	const debouncedQuery = useDebounce<string>(query, 200)
 	const currentDate = useMemo(() => new Date(), [])
@@ -35,7 +35,7 @@ export default function AlkesSearchBar() {
 
 	const isTyping = query !== debouncedQuery
 
-	const handleSaveAlkesItem = (alkesItem: AlkesItem) => {
+	const handleSaveAlkesItem = (alkesItem: AlkesItemsByTypeWithCountriesAndHscode[number]) => {
 		const duplicateAlkes = alkes.some((item) => item.id === alkesItem.alkes.id)
 		const alkesIdFormatted = alkesItem.alkes.id.split('_').join(' ')
 

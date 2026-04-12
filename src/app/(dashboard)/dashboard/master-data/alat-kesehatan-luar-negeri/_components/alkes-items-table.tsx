@@ -1,31 +1,30 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 
-import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { useQuery } from '@tanstack/react-query'
+import { createColumnHelper, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 
-import { useAlkesActions, useAlkesItems } from '@/lib/features/alkes/alkes-store-provider'
-import { cn } from '@/lib/utils/utils'
+import { getAlkesItemsByAlkesIdQueryOptions } from '@/lib/features/alkes/alkes-queries'
 
 import { DataTable, DataTableColumnHeader } from '@/components/data-table'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
 
-import type { AlkesItem } from '@/lib/features/alkes/alkes.types'
-import type { Row } from '@tanstack/react-table'
+import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
+import type { PaginationState, Row } from '@tanstack/react-table'
 
-interface AlkesRowDetailProps {
-	row: Row<AlkesItem>
+interface AlkesItemsTableRowDetailProps {
+	row: Row<AlkesItemsByTypeWithCountriesAndHscode[number]>
 }
 
-function AlkesRowDetail({ row }: AlkesRowDetailProps) {
+function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 	const data = row.original
-	const { deleteAlkesItem } = useAlkesActions()
 
 	return (
 		<React.Fragment>
-			<div className="grid grid-cols-12 gap-5 px-6 py-8">
+			<div className="grid grid-cols-12 gap-5 bg-white px-6 py-8">
 				<div className="col-span-12 space-y-4 xl:col-span-6">
 					<div className="grid grid-cols-4 gap-4">
 						<div className="col-span-4 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-2">
@@ -128,24 +127,27 @@ function AlkesRowDetail({ row }: AlkesRowDetailProps) {
 					</div>
 				</div>
 			</div>
-			<div className="flex flex-row border-t border-primary/15 px-6 py-4 shadow-lg">
-				<Button variant="destructive" onClick={() => deleteAlkesItem(row.id)}>
-					Hapus
-				</Button>
+			<div className="flex flex-row gap-x-2 border-t border-primary/15 px-6 py-4 shadow-lg">
+				<Button variant="default">Update</Button>
+				<Button variant="destructive">Hapus</Button>
 			</div>
 		</React.Fragment>
 	)
 }
 
-export default function AlkesTable() {
-	const alkesItems = useAlkesItems()
+interface AlkesItemsTableProps {
+	alkesId: Alkes['id']
+}
 
-	const columnHelper = createColumnHelper<AlkesItem>()
+export default function AlkesItemsTable({ alkesId }: AlkesItemsTableProps) {
+	const { data, isPending, error } = useQuery(getAlkesItemsByAlkesIdQueryOptions(alkesId))
+
+	const columnHelper = createColumnHelper<AlkesItemsByTypeWithCountriesAndHscode[number]>()
 	const columns = useMemo(
 		() => [
 			columnHelper.accessor('type', {
-				id: 'alkes-type',
-				header: () => <DataTableColumnHeader title="Tipe"></DataTableColumnHeader>,
+				id: 'alkes-item-type',
+				header: () => <DataTableColumnHeader title="Tipe" />,
 				cell: (info) => {
 					return <span>{info.getValue()}</span>
 				},
@@ -155,52 +157,26 @@ export default function AlkesTable() {
 				},
 			}),
 			columnHelper.accessor('name', {
-				id: 'alkes-name',
-				header: () => <DataTableColumnHeader title="Deskripsi"></DataTableColumnHeader>,
+				id: 'alkes-item-name',
+				header: () => <DataTableColumnHeader title="Deskripsi" />,
 				cell: (info) => {
 					return <span>{info.getValue()}</span>
 				},
 			}),
 			columnHelper.accessor((row) => `${row.alkes.countries.name} / ${row.alkes.countries.code}`, {
-				id: 'alkes-country',
-				header: () => <DataTableColumnHeader title="Negara"></DataTableColumnHeader>,
+				id: 'alkes-item-country',
+				header: () => <DataTableColumnHeader title="Negara" />,
 				cell: (info) => {
-					return <span>{`${info.getValue()}`}</span>
+					return <span>{info.getValue()}</span>
 				},
 				meta: {
 					headerClassName: 'hidden lg:table-cell',
 					rowClassName: 'hidden lg:table-cell',
 				},
 			}),
-			columnHelper.accessor('alkes.expiry_date', {
-				id: 'alkes-status',
-				header: () => <DataTableColumnHeader title="Status"></DataTableColumnHeader>,
-				cell: (info) => (
-					<span
-						className={cn(
-							'inline-flex flex-row items-center gap-x-1 rounded-full px-2 py-0.5',
-							new Date(info.getValue()) < new Date()
-								? 'bg-destructive/10 text-destructive/60'
-								: 'bg-green-100 text-green-600',
-						)}
-					>
-						{new Date(info.getValue()) < new Date() ? (
-							<React.Fragment>
-								<Icons.circleX strokeWidth={3} className="size-4" />
-								<span>Kadaluarsa</span>
-							</React.Fragment>
-						) : (
-							<React.Fragment>
-								<Icons.circleCheckBig strokeWidth={3} className="size-4" />
-								<span>Aktif</span>
-							</React.Fragment>
-						)}
-					</span>
-				),
-			}),
 			columnHelper.display({
-				id: 'details',
-				header: () => <DataTableColumnHeader title="Details"></DataTableColumnHeader>,
+				id: 'alkes-item-details',
+				header: () => <DataTableColumnHeader title="Details" />,
 				cell: () => (
 					<CollapsibleTrigger asChild>
 						<Button variant="outline" size="icon" className="rounded-full">
@@ -218,22 +194,35 @@ export default function AlkesTable() {
 		[columnHelper],
 	)
 
+	const [pagination, setPagination] = useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10,
+	})
+
 	const table = useReactTable({
-		data: alkesItems,
+		data: data ?? [],
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		onPaginationChange: setPagination,
 		getRowId: (row) => row.id,
+		state: { pagination },
 		autoResetAll: false,
 	})
 
 	return (
-		<div className="flex max-w-full flex-auto flex-col overflow-auto">
-			<DataTable
-				table={table}
-				stickyHeader={true}
-				emptyDataText="Belum ada izin alkes yang terpilih"
-				renderRowDetails={(row) => <AlkesRowDetail row={row} />}
-			/>
+		<div className="flex max-w-full flex-auto flex-col overflow-auto shadow-md">
+			{isPending ? (
+				<div>Loading...</div>
+			) : (
+				<DataTable
+					className="bg-muted"
+					table={table}
+					stickyHeader={false}
+					emptyDataText="Alkes ini tidak memiliki item terdaftar"
+					renderRowDetails={(row) => <AlkesItemsTableRowDetail row={row} />}
+				/>
+			)}
 		</div>
 	)
 }

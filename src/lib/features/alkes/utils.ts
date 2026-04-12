@@ -1,8 +1,14 @@
+import { useQueryState } from 'nuqs'
+
 import { formatDate } from '@/lib/utils/utils'
 
-import type { AlkesItem } from '@/lib/features/alkes/alkes.types'
+import type { AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 
-export const mapAlkesToExcelRow = (item: AlkesItem, index: number) => ({
+export const useAlkesIdQueryString = () => {
+	return useQueryState('alkes-id')
+}
+
+export const mapAlkesToExcelRow = (item: AlkesItemsByTypeWithCountriesAndHscode[number], index: number) => ({
 	number: index + 1,
 	countryCode: item.alkes.countries.code,
 	type: item.type,

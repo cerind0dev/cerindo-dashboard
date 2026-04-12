@@ -6,20 +6,24 @@ import { ALKES_WORKSHEETS, mapAlkesToExcelRow } from '@/lib/features/alkes/utils
 import { downloadExcelJS } from '@/lib/utils/excel-utils'
 import { formatDate } from '@/lib/utils/utils'
 
-import type { Alkes, AlkesItem } from '@/lib/features/alkes/alkes.types'
+import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 
 export type AlkesState = {
-	alkesItems: AlkesItem[]
+	alkesItems: AlkesItemsByTypeWithCountriesAndHscode[number][]
 }
 
 /**
  * TODO: add reorderAlkesItem action
  */
+
 export type AlkesActions = {
-	addAlkesItem: (item: AlkesItem) => void
+	addAlkesItem: (item: AlkesItemsByTypeWithCountriesAndHscode[number]) => void
 	deleteAlkesItem: (id: string) => void
-	exportAlkesToZip: (origin: string, alkes: Alkes[]) => Promise<void>
-	exportAlkesToExcel: (alkesItems: AlkesItem[]) => Promise<void>
+	exportAlkesToZip: (
+		origin: string,
+		alkes: Pick<Alkes, 'id' | 'creation_date' | 'expiry_date' | 'file_url'>[],
+	) => Promise<void>
+	exportAlkesToExcel: (alkesItems: AlkesItemsByTypeWithCountriesAndHscode[number][]) => Promise<void>
 	clearAllAlkesItems: () => void
 }
 

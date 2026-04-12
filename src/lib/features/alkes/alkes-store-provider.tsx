@@ -33,7 +33,7 @@ const useAlkesStore = <T,>(selector: (store: AlkesStore) => T): T => {
 
 export const useAlkesActions = () => useAlkesStore((state) => state.actions)
 export const useAlkesItems = () => useAlkesStore((state) => state.alkesItems)
-export const useDistinctAlkes = (): Alkes[] => {
+export const useDistinctAlkes = (): Pick<Alkes, 'id' | 'creation_date' | 'expiry_date' | 'file_url'>[] => {
 	const alkesItems = useAlkesItems()
 	const map = new Map()
 
