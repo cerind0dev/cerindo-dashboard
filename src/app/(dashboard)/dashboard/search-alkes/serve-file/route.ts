@@ -56,7 +56,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 					}
 
 					try {
-						const response = await supabase.storage.from('cerindo').download(file.file_url) // will download the files into memory
+						const response = await supabase.storage.from('cerindo/alkes').download(file.file_url) // will download the files into memory
 
 						if (response.error !== null || !response.data) {
 							throw new Error(response.error?.message || 'Berkas tidak ditemukan')
