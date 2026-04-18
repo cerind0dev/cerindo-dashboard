@@ -3,9 +3,10 @@ import React from 'react'
 import { rubik } from '@/config/font'
 
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from '@/components/page-header'
-import SearchAlkesFooter from '@/app/(dashboard)/dashboard/search-alkes/_components/search-alkes-footer'
-import SearchAlkesSearchBar from '@/app/(dashboard)/dashboard/search-alkes/_components/search-alkes-search-bar'
-import SearchAlkesTable from '@/app/(dashboard)/dashboard/search-alkes/_components/search-alkes-table'
+
+import SearchAlkesFooter from './_components/search-alkes-footer'
+import SearchAlkesSearchBar from './_components/search-alkes-search-bar'
+import SearchAlkesTable from './_components/search-alkes-table'
 
 export default async function SearchAlkesPage() {
 	return (

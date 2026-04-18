@@ -1,6 +1,6 @@
 import React from 'react'
 
-import UpdatePasswordForm from '@/app/(authentication)/_components/forms/update-password-form'
+import UpdatePasswordForm from '../_components/forms/update-password-form'
 
 export default async function UpdatePasswordPage() {
 	return (

@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
-import OAuthLogin from '@/app/(authentication)/_components/oauth-login'
+
+import OAuthLogin from '../oauth-login'
 
 export default function LoginForm({ className, ...props }: React.ComponentProps<'form'>) {
 	const [visiblePassword, setVisiblePassword] = useState<boolean>(false)

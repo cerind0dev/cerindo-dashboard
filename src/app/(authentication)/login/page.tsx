@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 import Icons from '@/components/icons'
-import LoginForm from '@/app/(authentication)/_components/forms/login-form'
+
+import LoginForm from '../_components/forms/login-form'
 
 export default async function LoginPage() {
 	const supabase = await createClient()

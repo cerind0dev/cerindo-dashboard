@@ -2,7 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 
 import Icons from '@/components/icons'
-import ForgotPasswordForm from '@/app/(authentication)/_components/forms/forgot-password-form'
+
+import ForgotPasswordForm from '../_components/forms/forgot-password-form'
 
 export default async function ForgotPasswordPage() {
 	return (

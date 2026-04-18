@@ -2,7 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 
 import Icons from '@/components/icons'
-import RegistrationForm from '@/app/(authentication)/_components/forms/registration-form'
+
+import RegistrationForm from '../_components/forms/registration-form'
 
 export default async function RegisterPage() {
 	return (

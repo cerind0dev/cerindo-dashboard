@@ -1,6 +1,6 @@
 import React from 'react'
 
-import ResendEmailButton from '@/app/(authentication)/_components/resend-email-button'
+import ResendEmailButton from '../../_components/resend-email-button'
 
 interface VerifyEmailPageProps {
 	searchParams: Promise<{ [key: string]: string }>
