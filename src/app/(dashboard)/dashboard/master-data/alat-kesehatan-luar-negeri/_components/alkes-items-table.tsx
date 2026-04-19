@@ -5,12 +5,21 @@ import React, { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { createColumnHelper, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 
-import { getAlkesItemsByAlkesIdQueryOptions } from '@/lib/features/alkes/alkes-queries'
+import { getAlkesItemsByAlkesIdQueryOptions, useDeleteAlkesItemMutation } from '@/lib/features/alkes/alkes-queries'
 
 import { DataTable, DataTableColumnHeader } from '@/components/data-table'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog'
 
 import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { PaginationState, Row } from '@tanstack/react-table'
@@ -21,6 +30,19 @@ interface AlkesItemsTableRowDetailProps {
 
 function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 	const data = row.original
+	const normalizedAlkesItemId = data.id.split('_')[0]
+
+	const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false)
+	const deleteAlkesItemMutation = useDeleteAlkesItemMutation(data.id)
+
+	const handleDeleteAlkesItem = async () => {
+		try {
+			await deleteAlkesItemMutation.mutateAsync()
+			setShowDeleteDialog(false)
+		} catch {
+			setShowDeleteDialog(false)
+		}
+	}
 
 	return (
 		<React.Fragment>
@@ -129,7 +151,43 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 			</div>
 			<div className="flex flex-row gap-x-2 border-t border-primary/15 px-6 py-4 shadow-lg">
 				<Button variant="default">Update</Button>
-				<Button variant="destructive">Hapus</Button>
+				<Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+					<DialogTrigger asChild>
+						<Button type="button" variant="destructive" disabled={deleteAlkesItemMutation.isPending}>
+							Hapus
+						</Button>
+					</DialogTrigger>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Delete item {`${normalizedAlkesItemId}`}?</DialogTitle>
+							<DialogDescription>
+								Apakah Anda yakin akan menghapus <strong>{`${normalizedAlkesItemId}`}?</strong> Data item akan dihapus
+								secara permanen
+							</DialogDescription>
+						</DialogHeader>
+						<DialogFooter>
+							<Button
+								type="button"
+								variant="outline"
+								disabled={deleteAlkesItemMutation.isPending}
+								onClick={() => setShowDeleteDialog(false)}
+							>
+								Batal
+							</Button>
+							<Button
+								type="button"
+								variant="destructive"
+								disabled={deleteAlkesItemMutation.isPending}
+								onClick={handleDeleteAlkesItem}
+							>
+								{deleteAlkesItemMutation.isPending && (
+									<Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />
+								)}
+								Hapus
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
 			</div>
 		</React.Fragment>
 	)

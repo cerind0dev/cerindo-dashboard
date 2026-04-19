@@ -2,6 +2,7 @@ import { keepPreviousData, queryOptions, useMutation, useQueryClient } from '@ta
 import { toast } from 'sonner'
 
 import {
+	deleteAlkesItemQuery,
 	deleteAlkesQuery,
 	getAlkesByIdQuery,
 	getAlkesItemsByAlkesIdQuery,
@@ -13,7 +14,12 @@ import { createClient as createBrowserClient } from '@/lib/supabase/client'
 
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Alkes, AlkesItem, AlkesWithCountriesAndHscode } from './alkes.types'
+import type {
+	Alkes,
+	AlkesItem,
+	AlkesItemsByAlkesIdWithCountriesAndHscode,
+	AlkesWithCountriesAndHscode,
+} from './alkes.types'
 
 const queryKeys = {
 	all: () => ['alkes'] as const,
@@ -51,6 +57,40 @@ export function getAlkesByIdQueryOptions(id: Alkes['id']) {
 		},
 		enabled: !!id,
 		placeholderData: keepPreviousData,
+	})
+}
+
+export function getAlkesItemsByAlkesIdQueryOptions(alkesId: Alkes['id']) {
+	const supabase = createBrowserClient()
+
+	return queryOptions({
+		queryKey: queryKeys.getAlkesItemsByAlkesId(alkesId),
+		queryFn: async () => {
+			const response = await getAlkesItemsByAlkesIdQuery(supabase, alkesId)
+			if (response.error) {
+				throw response.error
+			}
+
+			return response.data
+		},
+		enabled: alkesId.length > 0,
+	})
+}
+
+export function getAlkesItemsByTypeQueryOptions(type: AlkesItem['type']) {
+	const supabase = createBrowserClient()
+
+	return queryOptions({
+		queryKey: queryKeys.getAlkesItemsByType(type),
+		queryFn: async () => {
+			const response = await getAlkesItemsByTypeQuery(supabase, type)
+			if (response.error) {
+				throw response.error
+			}
+
+			return response.data
+		},
+		enabled: !!type,
 	})
 }
 
@@ -123,36 +163,44 @@ export function useDeleteAlkesMutation(id: Alkes['id']) {
 	})
 }
 
-export function getAlkesItemsByAlkesIdQueryOptions(alkesId: Alkes['id']) {
+export function useDeleteAlkesItemMutation(id: AlkesItem['id']) {
 	const supabase = createBrowserClient()
+	const queryClient = useQueryClient()
 
-	return queryOptions({
-		queryKey: queryKeys.getAlkesItemsByAlkesId(alkesId),
-		queryFn: async () => {
-			const response = await getAlkesItemsByAlkesIdQuery(supabase, alkesId)
+	return useMutation({
+		mutationFn: async () => {
+			const response = await deleteAlkesItemQuery(supabase, id)
 			if (response.error) {
 				throw response.error
 			}
-
-			return response.data
 		},
-		enabled: alkesId.length > 0,
-	})
-}
+		onMutate: async () => {
+			await queryClient.cancelQueries({ queryKey: queryKeys.all() })
 
-export function getAlkesItemsByTypeQueryOptions(type: AlkesItem['type']) {
-	const supabase = createBrowserClient()
-
-	return queryOptions({
-		queryKey: queryKeys.getAlkesItemsByType(type),
-		queryFn: async () => {
-			const response = await getAlkesItemsByTypeQuery(supabase, type)
-			if (response.error) {
-				throw response.error
+			const previous = queryClient.getQueryData<AlkesItemsByAlkesIdWithCountriesAndHscode>(queryKeys.all())
+			if (previous) {
+				queryClient.setQueryData<AlkesItemsByAlkesIdWithCountriesAndHscode>(queryKeys.all(), (old) => {
+					return old?.filter((alkesItem) => alkesItem.id !== id)
+				})
 			}
 
-			return response.data
+			return { previous }
 		},
-		enabled: !!type,
+		onSuccess: () => {
+			toast.success(`Item ${id.split('_')[0]} berhasil dihapus`, { position: 'top-right' })
+		},
+		onError: (error, _, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(queryKeys.all(), context.previous)
+			}
+
+			const message = error.message || 'An unexpected error occurred'
+			toast.error(`Gagal menghapus item ${id.split('_')[0]}: ${message}`, { position: 'top-right' })
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: queryKeys.all(), exact: false })
+			queryClient.removeQueries({ queryKey: queryKeys.getAlkesById(id) })
+			queryClient.removeQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(id) })
+		},
 	})
 }

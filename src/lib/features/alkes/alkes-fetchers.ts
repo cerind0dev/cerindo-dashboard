@@ -42,18 +42,6 @@ export function getAlkesByIdQuery(client: SupabaseClient<Database>, id: Alkes['i
 		.single()
 }
 
-export function updateAlkesQuery(
-	client: SupabaseClient<Database>,
-	id: Alkes['id'],
-	payload: Database['public']['Tables']['alkes']['Update'],
-) {
-	return client.from('alkes').update(payload).eq('id', id)
-}
-
-export function deleteAlkesQuery(client: SupabaseClient<Database>, id: Alkes['id']) {
-	return client.from('alkes').delete().eq('id', id)
-}
-
 export function getAlkesItemsByTypeQuery(client: SupabaseClient<Database>, type: AlkesItem['type']) {
 	return client
 		.from('alkes_items')
@@ -88,4 +76,20 @@ export function getAlkesItemsByAlkesIdQuery(client: SupabaseClient<Database>, al
       )`,
 		)
 		.eq('id_alkes', alkesId)
+}
+
+export function updateAlkesQuery(
+	client: SupabaseClient<Database>,
+	id: Alkes['id'],
+	payload: Database['public']['Tables']['alkes']['Update'],
+) {
+	return client.from('alkes').update(payload).eq('id', id)
+}
+
+export function deleteAlkesQuery(client: SupabaseClient<Database>, id: Alkes['id']) {
+	return client.from('alkes').delete().eq('id', id)
+}
+
+export function deleteAlkesItemQuery(client: SupabaseClient<Database>, id: AlkesItem['id']) {
+	return client.from('alkes_items').delete().eq('id', id)
 }
