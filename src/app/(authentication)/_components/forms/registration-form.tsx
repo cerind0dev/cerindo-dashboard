@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useActionState, useEffect, useState } from 'react'
+import React, { startTransition, useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { initialFormState, mergeForm, useForm, useStore, useTransform } from '@tanstack/react-form-nextjs'
@@ -26,6 +26,16 @@ export default function RegistrationForm({ className, ...props }: React.Componen
 		...authFormOptions,
 		validators: { onSubmitAsync: authSchema },
 		transform: useTransform((baseForm) => mergeForm(baseForm, state ?? {}), [state]),
+		onSubmit: ({ value }) => {
+			const formData = new FormData()
+			Object.entries(value).forEach(([key, value]) => {
+				formData.append(key, value)
+			})
+
+			startTransition(() => {
+				action(formData)
+			})
+		},
 	})
 
 	const isSubmitSuccessful = useStore(form.store, (formState) => formState.isSubmitSuccessful)
@@ -39,8 +49,11 @@ export default function RegistrationForm({ className, ...props }: React.Componen
 	return (
 		<form
 			id="registration-form"
-			action={action as never}
-			onSubmit={() => form.handleSubmit()}
+			onSubmit={(event) => {
+				event.preventDefault()
+				event.stopPropagation()
+				form.handleSubmit()
+			}}
 			className={cn('flex flex-col gap-6', className)}
 			{...props}
 		>

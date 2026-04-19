@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useActionState, useState } from 'react'
+import React, { startTransition, useActionState, useState } from 'react'
 import Link from 'next/link'
 
 import { initialFormState, mergeForm, useForm, useTransform } from '@tanstack/react-form-nextjs'
@@ -25,13 +25,26 @@ export default function LoginForm({ className, ...props }: React.ComponentProps<
 		...authFormOptions,
 		validators: { onSubmitAsync: authSchema },
 		transform: useTransform((baseForm) => mergeForm(baseForm, state ?? {}), [state]),
+		onSubmit: ({ value }) => {
+			const formData = new FormData()
+			Object.entries(value).forEach(([key, value]) => {
+				formData.append(key, value)
+			})
+
+			startTransition(() => {
+				action(formData)
+			})
+		},
 	})
 
 	return (
 		<form
 			id="login-form"
-			action={action as never}
-			onSubmit={() => form.handleSubmit()}
+			onSubmit={(event) => {
+				event.preventDefault()
+				event.stopPropagation()
+				form.handleSubmit()
+			}}
 			className={cn('flex flex-col gap-6', className)}
 			{...props}
 		>
