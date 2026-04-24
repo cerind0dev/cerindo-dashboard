@@ -56,16 +56,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 					}
 
 					try {
-						const response = await supabase.storage.from('cerindo/alkes').download(file.file_url) // will download the files into memory
+						// const response = await supabase.storage.from('cerindo/alkes').download(file.file_url) // will download the files into memory
+						const response = await supabase.storage.from('cerindo/alkes').createSignedUrl(file.file_url, 60)
 
 						if (response.error !== null || !response.data) {
 							throw new Error(response.error?.message || 'Berkas tidak ditemukan')
 						}
 
-						const extension = response.data.type.split('/')[1] || 'pdf'
-						const entryPromise = new Promise((resolve) => archive.once('entry', resolve))
+						const fileResponse = await fetch(response.data.signedUrl)
+						if (!fileResponse.ok || !fileResponse.body) {
+							throw new Error('Gagal mengunduh berkas')
+						}
+
+						const extension = fileResponse.type.split('/')[1] || 'pdf'
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						const nodeReadable = Readable.fromWeb(response.data.stream() as any)
+						const nodeReadable = Readable.fromWeb(fileResponse.body as any)
+						const entryPromise = new Promise((resolve, reject) => {
+							archive.once('entry', resolve)
+							archive.once('error', reject)
+						})
 
 						archive.append(nodeReadable, { name: `${file.id}.${extension}` })
 						await entryPromise
