@@ -12,6 +12,7 @@ export const mapAlkesToExcelRow = (item: AlkesItemsByTypeWithCountriesAndHscode[
 	number: index + 1,
 	countryCode: item.alkes.countries.code,
 	type: item.type,
+	alkesItemName: item.name,
 	brandName: item.alkes.brand_name,
 	packaging: `KEMASAN : ${item.alkes.packaging}`,
 	description: item.description,
@@ -45,7 +46,8 @@ export const ALKES_WORKSHEETS = [
 			{ header: 'FASILITAS', key: 'facility' },
 			{ header: 'AKL', key: 'alkesCode' },
 			{ header: 'TANGGAL TERBIT AKL', key: 'alkesCreationDate' },
-			{ header: 'DESKRIPSI DI AKL', key: 'description' },
+			{ header: 'DESKRIPSI DI AKL', key: 'alkesItemName' },
+			{ header: 'DESKRIPSI DI INVOICE', key: 'description' },
 		],
 	},
 	{
