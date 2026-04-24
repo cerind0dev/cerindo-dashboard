@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 
 import { flexRender } from '@tanstack/react-table'
 
@@ -92,6 +92,8 @@ export function DataTable<TData>({
 	emptyDataText,
 	renderRowDetails,
 }: DataTableProps<TData>) {
+	const [openItem, setOpenItem] = useState<string | null>(null)
+
 	return (
 		<Table className={cn(className)}>
 			<TableHeader className={cn(stickyHeader && 'sticky top-0 z-10', 'shadow-sm [&_tr]:border-b-0')}>
@@ -142,7 +144,12 @@ export function DataTable<TData>({
 				) : (
 					table.getRowModel().rows.map((row) => {
 						return (
-							<Collapsible key={row.id} asChild>
+							<Collapsible
+								key={row.id}
+								open={openItem === row.id}
+								onOpenChange={() => setOpenItem((previous) => (previous === row.id ? null : row.id))}
+								asChild
+							>
 								<React.Fragment>
 									<TableRow>
 										{row.getVisibleCells().map((cell) => {
