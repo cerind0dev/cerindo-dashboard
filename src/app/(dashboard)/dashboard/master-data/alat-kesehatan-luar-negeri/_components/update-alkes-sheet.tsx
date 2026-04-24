@@ -7,7 +7,9 @@ import { useQuery } from '@tanstack/react-query'
 import { getAlkesByIdQueryOptions } from '@/lib/features/alkes/alkes-queries'
 import { useAlkesIdQueryString } from '@/lib/features/alkes/utils'
 
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import UpdateAlkesForm from './forms/update-alkes-form'
 
@@ -20,7 +22,38 @@ export default function UpdateAlkesSheet() {
 	return (
 		<SheetContent side="right" showCloseButton={false} onCloseAutoFocus={(event) => event.preventDefault()}>
 			{!data || isPending ? (
-				<div>Loading...</div>
+				<Card className="flex-1 rounded-none border-0 shadow-none">
+					<CardHeader>
+						<Skeleton className="h-4 w-2/3" />
+						<Skeleton className="h-4 w-1/2" />
+					</CardHeader>
+					<CardContent className="mt-4 flex w-full flex-col gap-7">
+						<div className="flex flex-col gap-3">
+							<Skeleton className="h-4 w-20" />
+							<Skeleton className="h-8 w-full" />
+						</div>
+						<div className="flex flex-col gap-3">
+							<Skeleton className="h-4 w-48" />
+							<Skeleton className="h-8 w-full" />
+						</div>
+						<div className="flex flex-col gap-3">
+							<Skeleton className="h-4 w-64" />
+							<Skeleton className="h-8 w-full" />
+						</div>
+						<div className="flex flex-col gap-3">
+							<Skeleton className="h-4 w-36" />
+							<Skeleton className="h-8 w-full" />
+						</div>
+						<div className="flex flex-col gap-3">
+							<Skeleton className="h-4 w-36" />
+							<Skeleton className="h-8 w-full" />
+						</div>
+					</CardContent>
+					<CardFooter className="mt-auto flex flex-col gap-4">
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+					</CardFooter>
+				</Card>
 			) : (
 				<React.Fragment>
 					<SheetHeader className="pb-0">

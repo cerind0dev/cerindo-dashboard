@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useTransition } from 'react'
+import React from 'react'
 import { usePathname } from 'next/navigation'
-
-import { toast } from 'sonner'
 
 import { useAlkesActions, useAlkesItems, useDistinctAlkes } from '@/lib/features/alkes/alkes-store-provider'
 
+import ActionButton from '@/components/action-button'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,35 +19,12 @@ import {
 import { Separator } from '@/components/ui/separator'
 
 export default function SearchAlkesFooter() {
-	const [isPending, startTransition] = useTransition()
 	const pathname = usePathname()
 
 	const alkesItems = useAlkesItems()
 	const alkes = useDistinctAlkes()
 
 	const { clearAllAlkesItems, exportAlkesToZip, exportAlkesToExcel } = useAlkesActions()
-
-	const handleExportAlkesToZip = () => {
-		startTransition(async () => {
-			toast.promise(exportAlkesToZip(pathname, alkes), {
-				loading: 'Menyiapkan berkas ZIP...',
-				success: 'Berkas ZIP berhasil diunduh!',
-				error: (error) => error.message,
-				position: 'top-right',
-			})
-		})
-	}
-
-	const handleExportAlkesToExcel = () => {
-		startTransition(async () => {
-			toast.promise(exportAlkesToExcel(alkesItems), {
-				loading: 'Menyiapkan berkas excel...',
-				success: 'Berkas excel berhasil diunduh!',
-				error: () => 'Maaf, terjadi kesalahan saat mengunduh berkas excel',
-				position: 'top-right',
-			})
-		})
-	}
 
 	return (
 		<div className="mt-auto flex items-center justify-between border-t border-slate-300 bg-background px-4 py-3 sm:px-6 lg:px-8">
@@ -66,13 +42,35 @@ export default function SearchAlkesFooter() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-56" align="end" forceMount>
 						<DropdownMenuGroup>
-							<DropdownMenuItem onClick={() => handleExportAlkesToExcel()}>
-								<Icons.download className="size-4 text-primary" />
-								Export excel &#40;xlsx&#41;
+							<DropdownMenuItem asChild>
+								<ActionButton
+									variant="ghost"
+									className="w-full justify-start px-1.5 font-normal"
+									action={() => exportAlkesToExcel(alkesItems)}
+									message={{
+										loading: 'Menyiapkan berkas excel...',
+										success: 'Berkas excel berhasil diunduh!',
+										error: 'Maaf, terjadi kesalahan saat mengunduh berkas excel',
+									}}
+								>
+									<Icons.download className="size-4 text-primary" />
+									Export excel &#40;xlsx&#41;
+								</ActionButton>
 							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleExportAlkesToZip()}>
-								<Icons.fileArchive className="size-4 text-primary" />
-								Download AKL &#40;zip&#41;
+							<DropdownMenuItem asChild>
+								<ActionButton
+									variant="ghost"
+									className="w-full justify-start px-1.5 font-normal"
+									action={() => exportAlkesToZip(pathname, alkes)}
+									message={{
+										loading: 'Menyiapkan berkas ZIP...',
+										success: 'Berkas ZIP berhasil diunduh!',
+										error: 'Maaf, terjadi kesalahan saat mengunduh berkas ZIP',
+									}}
+								>
+									<Icons.fileArchive className="size-4 text-primary" />
+									Download AKL &#40;zip&#41;
+								</ActionButton>
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
@@ -86,24 +84,30 @@ export default function SearchAlkesFooter() {
 			</div>
 			<div className="hidden gap-2 lg:flex lg:items-center">
 				<div className="flex items-center space-x-2">
-					<Button
+					<ActionButton
 						variant="outline"
 						className="h-max px-2 py-1 text-[13px]"
-						disabled={isPending}
-						onClick={() => handleExportAlkesToExcel()}
+						action={() => exportAlkesToExcel(alkesItems)}
+						message={{
+							loading: 'Menyiapkan berkas excel...',
+							success: 'Berkas excel berhasil diunduh!',
+							error: 'Maaf, terjadi kesalahan saat mengunduh berkas excel',
+						}}
 					>
-						{isPending && <Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />}
 						Export &#40;xlsx&#41;
-					</Button>
-					<Button
+					</ActionButton>
+					<ActionButton
 						variant="outline"
 						className="h-max px-2 py-1 text-[13px]"
-						disabled={isPending}
-						onClick={() => handleExportAlkesToZip()}
+						action={() => exportAlkesToZip(pathname, alkes)}
+						message={{
+							loading: 'Menyiapkan berkas ZIP...',
+							success: 'Berkas ZIP berhasil diunduh!',
+							error: 'Maaf, terjadi kesalahan saat mengunduh berkas ZIP',
+						}}
 					>
-						{isPending && <Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />}
 						Download &#40;zip&#41;
-					</Button>
+					</ActionButton>
 				</div>
 				<Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
 				<Button variant="destructive" className="h-max px-2 py-1 text-[13px]" onClick={() => clearAllAlkesItems()}>

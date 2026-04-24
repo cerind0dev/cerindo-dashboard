@@ -17,8 +17,10 @@ import { cn } from '@/lib/utils/utils'
 import { DataTable, DataTableColumnHeader } from '@/components/data-table'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
 import { SheetTrigger } from '@/components/ui/sheet'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import AlkesItemsTable from './alkes-items-table'
 
@@ -185,7 +187,20 @@ export default function AlkesTable() {
 	return (
 		<div className="flex max-w-full flex-auto flex-col overflow-auto">
 			{isPending ? (
-				<div>Loading...</div>
+				<Card className="rounded-none border-0 shadow-none">
+					<CardContent className="flex w-full flex-col gap-8">
+						{Array.from({ length: 8 }).map((_, index) => (
+							<div className="flex gap-4" key={index}>
+								<Skeleton className="h-8 flex-2" />
+								<Skeleton className="hidden h-8 flex-6 lg:block" />
+								<Skeleton className="hidden h-8 flex-1 lg:block" />
+								<Skeleton className="h-8 flex-1" />
+								<Skeleton className="h-8 flex-1" />
+								<Skeleton className="h-8 flex-1" />
+							</div>
+						))}
+					</CardContent>
+				</Card>
 			) : (
 				<DataTable
 					table={table}

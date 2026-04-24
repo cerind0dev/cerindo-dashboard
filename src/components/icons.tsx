@@ -1,6 +1,7 @@
 import {
 	ArrowLeft,
 	BookCheck,
+	Calendar,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,
@@ -31,6 +32,7 @@ export type Icon = LucideIcon
 const Icons = {
 	arrowLeft: ArrowLeft,
 	bookCheck: BookCheck,
+	calendar: Calendar,
 	chevronLeft: ChevronLeft,
 	chevronRight: ChevronRight,
 	chevronDown: ChevronDown,

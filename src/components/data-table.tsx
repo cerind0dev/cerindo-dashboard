@@ -69,6 +69,14 @@ function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) 
 	)
 }
 
+interface DataTableToolbar {
+	children: React.ReactNode
+}
+
+export function DataTableToolbar({ children }: DataTableToolbar) {
+	return <div className="border-t">{children}</div>
+}
+
 interface DataTableProps<TData> {
 	className?: string
 	table: TanstackTable<TData>

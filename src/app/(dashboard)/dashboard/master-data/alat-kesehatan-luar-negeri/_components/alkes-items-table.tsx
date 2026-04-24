@@ -10,6 +10,7 @@ import { getAlkesItemsByAlkesIdQueryOptions, useDeleteAlkesItemMutation } from '
 import { DataTable, DataTableColumnHeader } from '@/components/data-table'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
 	Dialog,
@@ -20,6 +21,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { PaginationState, Row } from '@tanstack/react-table'
@@ -271,7 +273,18 @@ export default function AlkesItemsTable({ alkesId }: AlkesItemsTableProps) {
 	return (
 		<div className="flex max-w-full flex-auto flex-col overflow-auto shadow-md">
 			{isPending ? (
-				<div>Loading...</div>
+				<Card className="rounded-none border-0 shadow-none">
+					<CardContent className="flex w-full flex-col gap-8">
+						{Array.from({ length: 4 }).map((_, index) => (
+							<div className="flex gap-4" key={index}>
+								<Skeleton className="hidden h-8 flex-1 sm:block" />
+								<Skeleton className="h-8 flex-4" />
+								<Skeleton className="hidden h-8 flex-1 md:block" />
+								<Skeleton className="h-8 flex-1" />
+							</div>
+						))}
+					</CardContent>
+				</Card>
 			) : (
 				<DataTable
 					className="bg-muted"
