@@ -1,5 +1,4 @@
 import { saveAs } from 'file-saver'
-import { nanoid } from 'nanoid'
 import { createStore } from 'zustand'
 
 import { ALKES_WORKSHEETS, mapAlkesToExcelRow } from '@/lib/features/alkes/utils'
@@ -39,9 +38,8 @@ export const createAlkesStore = (initialState: AlkesState = defaultInitialState)
 		actions: {
 			addAlkesItem: (item) =>
 				set((state) => {
-					const modifiedId = item.id + nanoid(10)
 					return {
-						alkesItems: [...state.alkesItems, { ...item, id: modifiedId }],
+						alkesItems: [...state.alkesItems, { ...item }],
 					}
 				}),
 			deleteAlkesItem: (id) =>

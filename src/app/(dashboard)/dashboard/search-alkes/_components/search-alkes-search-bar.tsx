@@ -95,10 +95,10 @@ export default function SearchAlkesSearchBar() {
 						<CardContent className="w-full p-0">
 							<ScrollArea>
 								<ul className="max-h-60">
-									{data.map((alkes, index) => {
+									{data.map((alkes) => {
 										return (
 											<li
-												key={`${alkes.id}-${index}`}
+												key={alkes.id}
 												className="cursor-pointer px-4 py-2 hover:bg-slate-100"
 												onClick={() => {
 													handleSaveAlkesItem(alkes)
