@@ -142,12 +142,13 @@ export function DataTable<TData>({
 						</TableCell>
 					</TableRow>
 				) : (
-					table.getRowModel().rows.map((row) => {
+					table.getRowModel().rows.map((row, index) => {
+						const modifiedId = row.id + '_' + index
 						return (
 							<Collapsible
-								key={row.id}
-								open={openItem === row.id}
-								onOpenChange={() => setOpenItem((previous) => (previous === row.id ? null : row.id))}
+								key={modifiedId}
+								open={openItem === modifiedId}
+								onOpenChange={() => setOpenItem((previous) => (previous === modifiedId ? null : modifiedId))}
 								asChild
 							>
 								<React.Fragment>
