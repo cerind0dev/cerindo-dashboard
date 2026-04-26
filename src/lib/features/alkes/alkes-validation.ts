@@ -13,6 +13,11 @@ export const updateAlkesSchema = z
 		packaging: z.string().nullable(),
 		creationDate: z.iso.datetime({ offset: true, error: "Date of issue of alkes can't be empty" }),
 		expiryDate: z.iso.datetime({ offset: true, error: "Alkes expiration date can't be empty" }),
+		file: z
+			.file()
+			.max(5_000_000, { error: 'Maximum size of the alkes file is 5 MB' })
+			.mime(['application/pdf'], { error: 'Alkes file must be a .pdf file' })
+			.nullable(),
 		fileUrl: z.string({ error: 'A valid file name is required' }),
 		countryId: z.uuid({ error: 'Please select a valid country' }),
 		hscodeId: z.uuid({ error: 'Please select a valid HS code' }),
@@ -29,6 +34,7 @@ export const updateAlkesFormOptions = (fromDatabase: AlkesByIdWithCountriesAndHs
 			packaging: fromDatabase.packaging,
 			creationDate: new Date(fromDatabase.creation_date).toISOString(),
 			expiryDate: new Date(fromDatabase.expiry_date).toISOString(),
+			file: null as File | null,
 			fileUrl: fromDatabase.file_url,
 			countryId: fromDatabase.countries.id,
 			hscodeId: fromDatabase.hscode.id,

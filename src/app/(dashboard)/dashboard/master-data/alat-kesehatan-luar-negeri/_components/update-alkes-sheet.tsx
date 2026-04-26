@@ -20,7 +20,12 @@ export default function UpdateAlkesSheet() {
 	const closeSheet = () => setAlkesIdQueryString(null)
 
 	return (
-		<SheetContent side="right" showCloseButton={false} onCloseAutoFocus={(event) => event.preventDefault()}>
+		<SheetContent
+			className="overflow-y-scroll"
+			side="right"
+			showCloseButton={false}
+			onCloseAutoFocus={(event) => event.preventDefault()}
+		>
 			{!data || isPending ? (
 				<Card className="flex-1 rounded-none border-0 shadow-none">
 					<CardHeader>

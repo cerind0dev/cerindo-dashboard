@@ -204,3 +204,42 @@ export function useDeleteAlkesItemMutation(id: AlkesItem['id']) {
 		},
 	})
 }
+
+export async function deleteAlkesFile(client: SupabaseClient<Database>, alkesFileName: string) {
+	try {
+		const response = await client.storage.from('cerindo').remove([`alkes/${alkesFileName}`])
+
+		if (response.error) {
+			throw response.error
+		}
+	} catch (error: unknown) {
+		throw error
+	}
+}
+
+export async function uploadAlkesFile(client: SupabaseClient<Database>, alkesFile: File) {
+	try {
+		const signedUploadUrlResponse = await client.storage
+			.from('cerindo')
+			.createSignedUploadUrl(`alkes/${alkesFile.name}`)
+
+		if (signedUploadUrlResponse.error) {
+			throw signedUploadUrlResponse.error
+		}
+
+		const fileUploadResponse = await client.storage
+			.from('cerindo')
+			.uploadToSignedUrl(`alkes/${alkesFile.name}`, signedUploadUrlResponse.data.token, alkesFile)
+
+		if (fileUploadResponse.error) {
+			throw fileUploadResponse.error
+		}
+
+		return {
+			path: fileUploadResponse.data.path,
+			name: alkesFile.name,
+		}
+	} catch (error: unknown) {
+		throw error
+	}
+}

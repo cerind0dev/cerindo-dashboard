@@ -4,12 +4,20 @@ import React, { useState } from 'react'
 
 import { useForm } from '@tanstack/react-form-nextjs'
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { unknown } from 'zod'
 
-import { useDeleteAlkesMutation, useUpdateAlkesMutation } from '@/lib/features/alkes/alkes-queries'
+import {
+	deleteAlkesFile,
+	uploadAlkesFile,
+	useDeleteAlkesMutation,
+	useUpdateAlkesMutation,
+} from '@/lib/features/alkes/alkes-queries'
 import { updateAlkesFormOptions, updateAlkesSchema } from '@/lib/features/alkes/alkes-validation'
 import { getCountriesQueryOptions } from '@/lib/features/countries/countries-queries'
 import { getHscodeQueryOptions } from '@/lib/features/hscode/hscode-queries'
-import { cn } from '@/lib/utils/utils'
+import { createClient } from '@/lib/supabase/client'
+import { cn, getErrorMessage } from '@/lib/utils/utils'
 
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
@@ -22,7 +30,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
-import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -42,11 +50,29 @@ export default function UpdateAlkesForm({ className, alkes, onActionSuccess, ...
 	const updateAlkesMutation = useUpdateAlkesMutation(alkes.id)
 	const deleteAlkesMutation = useDeleteAlkesMutation(alkes.id)
 
+	const [fileUrl, setFileUrl] = useState<string>(alkes.file_url)
+
 	const form = useForm({
 		...updateAlkesFormOptions(alkes),
 		validators: { onSubmitAsync: updateAlkesSchema },
 		onSubmit: async ({ value }) => {
+			const supabase = createClient()
+
 			try {
+				const oldFileUrl = alkes.file_url
+
+				if (value.file instanceof File) {
+					try {
+						await uploadAlkesFile(supabase, value.file)
+						if (value.fileUrl !== oldFileUrl) {
+							await deleteAlkesFile(supabase, oldFileUrl)
+						}
+					} catch (storageError: unknown) {
+						toast.error(getErrorMessage(storageError) || 'Gagal meng-upload berkas alkes', { position: 'top-right' })
+						return
+					}
+				}
+
 				await updateAlkesMutation.mutateAsync({
 					brand_name: value.brandName,
 					packaging: value.packaging,
@@ -175,12 +201,37 @@ export default function UpdateAlkesForm({ className, alkes, onActionSuccess, ...
 								)
 							}}
 						</form.Field>
-						<form.Field name="fileUrl" defaultValue={alkes.file_url}>
+						<form.Field name="file">
 							{(field) => {
 								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-								/**
-								 * TODO: add a way to upload file
-								 */
+
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Berkas</FieldLabel>
+										<Input
+											id={`${field.name}-actual-file`}
+											name={`${field.name}-actual-file`}
+											type="file"
+											className="file:rounded-full file:border-0 file:bg-primary/5 file:px-2 file:text-sm file:hover:bg-primary/10"
+											onChange={(event) => {
+												const file = event.target.files?.[0]
+												if (file) {
+													field.handleChange(file)
+													setFileUrl(file.name)
+													form.setFieldValue('fileUrl', file.name)
+												}
+											}}
+										/>
+										<FieldDescription>Pilih berkas alkes untuk diupload</FieldDescription>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						</form.Field>
+						<form.Field name="fileUrl" defaultValue={fileUrl}>
+							{(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+
 								return (
 									<Field data-invalid={isInvalid}>
 										<FieldLabel htmlFor={field.name}>Berkas</FieldLabel>
@@ -188,9 +239,11 @@ export default function UpdateAlkesForm({ className, alkes, onActionSuccess, ...
 											id={field.name}
 											name={field.name}
 											value={field.state.value}
-											type="text"
+											type="hidden"
 											onBlur={field.handleBlur}
-											onChange={(event) => field.handleChange(event.target.value)}
+											onChange={(event) => {
+												field.handleChange(event.target.value)
+											}}
 											aria-invalid={isInvalid}
 											placeholder="Enter the file name complete with its file extension"
 											autoComplete="off"

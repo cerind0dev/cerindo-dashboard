@@ -87,7 +87,9 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 						</div>
 					</div>
 					<div className="rounded border border-primary/15 px-2.5 py-2 shadow">
-						<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">Deskripsi</p>
+						<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+							Deskripsi di alkes
+						</p>
 						<p className="mt-1 truncate text-sm text-primary/85">{data.name !== null ? data.name : '-'}</p>
 					</div>
 				</div>
@@ -152,7 +154,6 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 				</div>
 			</div>
 			<div className="flex flex-row gap-x-2 border-t border-primary/15 px-6 py-4 shadow-lg">
-				<Button variant="default">Update</Button>
 				<Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
 					<DialogTrigger asChild>
 						<Button type="button" variant="destructive" disabled={deleteAlkesItemMutation.isPending}>

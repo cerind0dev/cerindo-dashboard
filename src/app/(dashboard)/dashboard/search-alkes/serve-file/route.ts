@@ -68,12 +68,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 							throw new Error('Gagal mengunduh berkas')
 						}
 
-						const extension = fileResponse.type.split('/')[1] || 'pdf'
+						const contentType = fileResponse.headers.get('content-type') || 'application/pdf'
+						const extension = contentType.split('/')[1] || 'pdf'
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						const nodeReadable = Readable.fromWeb(fileResponse.body as any)
 						const entryPromise = new Promise((resolve, reject) => {
 							archive.once('entry', resolve)
-							archive.once('error', reject)
 						})
 
 						archive.append(nodeReadable, { name: `${file.id}.${extension}` })
