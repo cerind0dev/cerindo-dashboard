@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 import { useForm } from '@tanstack/react-form-nextjs'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { unknown } from 'zod'
 
 import {
 	deleteAlkesFile,
@@ -233,7 +232,7 @@ export default function UpdateAlkesForm({ className, alkes, onActionSuccess, ...
 								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
 								return (
-									<Field data-invalid={isInvalid}>
+									<Field data-invalid={isInvalid} className="hidden">
 										<FieldLabel htmlFor={field.name}>Berkas</FieldLabel>
 										<Input
 											id={field.name}

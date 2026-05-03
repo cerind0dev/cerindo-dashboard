@@ -2,12 +2,14 @@
 
 import React, { useMemo } from 'react'
 
-import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { createColumnHelper } from '@tanstack/react-table'
 
 import { useAlkesActions, useAlkesItems } from '@/lib/features/alkes/alkes-store-provider'
 import { cn } from '@/lib/utils/utils'
 
-import { DataTable, DataTableColumnHeader } from '@/components/data-table'
+import useDataTable from '@/hooks/use-data-table'
+import { DataTable } from '@/components/data-table/data-table'
+import DataTableColumnHeader from '@/components/data-table/data-table-column-header'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -220,22 +222,19 @@ export default function SearchAlkesTable() {
 		[columnHelper],
 	)
 
-	const table = useReactTable({
+	const { table } = useDataTable({
 		data: alkesItems,
 		columns,
-		getCoreRowModel: getCoreRowModel(),
 		getRowId: (row) => row.id,
 		autoResetAll: false,
 	})
 
 	return (
-		<div className="flex max-w-full flex-auto flex-col overflow-auto">
-			<DataTable
-				table={table}
-				stickyHeader={true}
-				emptyDataText="Belum ada izin alkes yang terpilih"
-				renderRowDetails={(row) => <SearchAlkesRowDetail row={row} />}
-			/>
-		</div>
+		<DataTable
+			table={table}
+			stickyHeader={true}
+			emptyDataText="Belum ada izin alkes yang terpilih"
+			renderRowDetails={(row) => <SearchAlkesRowDetail row={row} />}
+		/>
 	)
 }

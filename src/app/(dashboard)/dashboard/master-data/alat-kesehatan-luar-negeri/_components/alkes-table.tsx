@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { createColumnHelper, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
+import { createColumnHelper } from '@tanstack/react-table'
 
 import {
 	getAlkesByIdQueryOptions,
@@ -14,7 +14,10 @@ import { useAlkesIdQueryString } from '@/lib/features/alkes/utils'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils/utils'
 
-import { DataTable, DataTableColumnHeader } from '@/components/data-table'
+import useDataTable from '@/hooks/use-data-table'
+import { DataTable } from '@/components/data-table/data-table'
+import DataTableColumnHeader from '@/components/data-table/data-table-column-header'
+import DataTableToolbar from '@/components/data-table/data-table-toolbar'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -25,7 +28,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import AlkesItemsTable from './alkes-items-table'
 
 import type { AlkesWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
-import type { PaginationState, Row } from '@tanstack/react-table'
+import type { Row } from '@tanstack/react-table'
 
 interface AlkesTableRowDetailProps {
 	row: Row<AlkesWithCountriesAndHscode[number]>
@@ -79,6 +82,15 @@ export default function AlkesTable() {
 				cell: (info) => {
 					const normalizedAlkesIdText = info.getValue().split('_').join(' ')
 					return <span>{normalizedAlkesIdText}</span>
+				},
+				meta: {
+					label: 'ID Alkes',
+					placeholder: 'Cari alkes berdasarkan nomor alkes...',
+					variant: 'text',
+				},
+				enableColumnFilter: true,
+				filterFn: (row, _, filterValue) => {
+					return filterValue.split(' ').join('_') === row.id
 				},
 			}),
 			columnHelper.accessor('brand_name', {
@@ -165,50 +177,41 @@ export default function AlkesTable() {
 				},
 			}),
 		],
-		[columnHelper, queryClient],
+		[columnHelper, queryClient, setAlkesIdQueryString],
 	)
 
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 15,
-	})
-
-	const table = useReactTable({
+	const { table } = useDataTable({
 		data: data ?? [],
 		columns,
-		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		onPaginationChange: setPagination,
 		getRowId: (row) => row.id,
-		state: { pagination },
 		autoResetAll: false,
 	})
 
-	return (
+	return isPending ? (
 		<div className="flex max-w-full flex-auto flex-col overflow-auto">
-			{isPending ? (
-				<Card className="rounded-none border-0 shadow-none">
-					<CardContent className="flex w-full flex-col gap-8">
-						{Array.from({ length: 8 }).map((_, index) => (
-							<div className="flex gap-4" key={index}>
-								<Skeleton className="h-8 flex-2" />
-								<Skeleton className="hidden h-8 flex-6 lg:block" />
-								<Skeleton className="hidden h-8 flex-1 lg:block" />
-								<Skeleton className="h-8 flex-1" />
-								<Skeleton className="h-8 flex-1" />
-								<Skeleton className="h-8 flex-1" />
-							</div>
-						))}
-					</CardContent>
-				</Card>
-			) : (
-				<DataTable
-					table={table}
-					stickyHeader={true}
-					emptyDataText="Tidak ada data alkes"
-					renderRowDetails={(row) => <AlkesTableRowDetail row={row} />}
-				/>
-			)}
+			<Card className="rounded-none border-0 shadow-none">
+				<CardContent className="flex w-full flex-col gap-8">
+					{Array.from({ length: 8 }).map((_, index) => (
+						<div className="flex gap-4" key={index}>
+							<Skeleton className="h-8 flex-2" />
+							<Skeleton className="hidden h-8 flex-6 lg:block" />
+							<Skeleton className="hidden h-8 flex-1 lg:block" />
+							<Skeleton className="h-8 flex-1" />
+							<Skeleton className="h-8 flex-1" />
+							<Skeleton className="h-8 flex-1" />
+						</div>
+					))}
+				</CardContent>
+			</Card>
 		</div>
+	) : (
+		<DataTable
+			table={table}
+			stickyHeader={true}
+			emptyDataText="Tidak ada data alkes"
+			renderRowDetails={(row) => <AlkesTableRowDetail row={row} />}
+		>
+			<DataTableToolbar table={table} className="border-b px-6 py-3" />
+		</DataTable>
 	)
 }

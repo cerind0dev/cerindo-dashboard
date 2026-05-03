@@ -3,11 +3,14 @@
 import React, { useMemo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
-import { createColumnHelper, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
+import { createColumnHelper } from '@tanstack/react-table'
 
 import { getAlkesItemsByAlkesIdQueryOptions, useDeleteAlkesItemMutation } from '@/lib/features/alkes/alkes-queries'
 
-import { DataTable, DataTableColumnHeader } from '@/components/data-table'
+import useDataTable from '@/hooks/use-data-table'
+import { DataTable } from '@/components/data-table/data-table'
+import DataTableColumnHeader from '@/components/data-table/data-table-column-header'
+import DataTableToolbar from '@/components/data-table/data-table-toolbar'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -24,7 +27,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 
 import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
-import type { PaginationState, Row } from '@tanstack/react-table'
+import type { Row } from '@tanstack/react-table'
 
 interface AlkesItemsTableRowDetailProps {
 	row: Row<AlkesItemsByTypeWithCountriesAndHscode[number]>
@@ -213,9 +216,14 @@ export default function AlkesItemsTable({ alkesId }: AlkesItemsTableProps) {
 					return <span>{info.getValue()}</span>
 				},
 				meta: {
+					label: 'Tipe',
+					placeholder: 'Cari item alkes berdasarkan tipe item alkes...',
+					variant: 'text',
 					headerClassName: 'hidden md:table-cell pr-0',
 					rowClassName: 'hidden md:table-cell pr-0',
 				},
+				enableColumnFilter: true,
+				filterFn: 'equalsString',
 			}),
 			columnHelper.accessor('name', {
 				id: 'alkes-item-name',
@@ -255,46 +263,37 @@ export default function AlkesItemsTable({ alkesId }: AlkesItemsTableProps) {
 		[columnHelper],
 	)
 
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 10,
-	})
-
-	const table = useReactTable({
+	const { table } = useDataTable({
 		data: data ?? [],
 		columns,
-		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		onPaginationChange: setPagination,
 		getRowId: (row) => row.id,
-		state: { pagination },
 		autoResetAll: false,
 	})
 
-	return (
-		<div className="flex max-w-full flex-auto flex-col overflow-auto shadow-md">
-			{isPending ? (
-				<Card className="rounded-none border-0 shadow-none">
-					<CardContent className="flex w-full flex-col gap-8">
-						{Array.from({ length: 4 }).map((_, index) => (
-							<div className="flex gap-4" key={index}>
-								<Skeleton className="hidden h-8 flex-1 sm:block" />
-								<Skeleton className="h-8 flex-4" />
-								<Skeleton className="hidden h-8 flex-1 md:block" />
-								<Skeleton className="h-8 flex-1" />
-							</div>
-						))}
-					</CardContent>
-				</Card>
-			) : (
-				<DataTable
-					className="bg-muted"
-					table={table}
-					stickyHeader={false}
-					emptyDataText="Alkes ini tidak memiliki item terdaftar"
-					renderRowDetails={(row) => <AlkesItemsTableRowDetail row={row} />}
-				/>
-			)}
+	return isPending ? (
+		<div className="flex max-w-full flex-auto flex-col overflow-auto">
+			<Card className="rounded-none border-0 shadow-none">
+				<CardContent className="flex w-full flex-col gap-8">
+					{Array.from({ length: 4 }).map((_, index) => (
+						<div className="flex gap-4" key={index}>
+							<Skeleton className="hidden h-8 flex-1 sm:block" />
+							<Skeleton className="h-8 flex-4" />
+							<Skeleton className="hidden h-8 flex-1 md:block" />
+							<Skeleton className="h-8 flex-1" />
+						</div>
+					))}
+				</CardContent>
+			</Card>
 		</div>
+	) : (
+		<DataTable
+			className="bg-muted shadow-md"
+			table={table}
+			stickyHeader={false}
+			emptyDataText="Alkes ini tidak memiliki item terdaftar"
+			renderRowDetails={(row) => <AlkesItemsTableRowDetail row={row} />}
+		>
+			<DataTableToolbar table={table} className="border-b px-6 py-3" />
+		</DataTable>
 	)
 }
