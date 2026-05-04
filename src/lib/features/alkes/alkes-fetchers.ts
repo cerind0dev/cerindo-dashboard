@@ -1,13 +1,13 @@
-import type { Alkes, AlkesItem } from '@/lib/features/alkes/alkes.types'
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Alkes, AlkesItem } from './alkes.types'
 
 export function getAlkesQuery(client: SupabaseClient<Database>) {
 	return (
 		client
 			.from('alkes')
 			.select(
-				`id, brand_name, packaging, creation_date, expiry_date, 
+				`id, brand_name, packaging, creation_date, expiry_date,
       countries (
         code, name
       ),
@@ -46,8 +46,8 @@ export function getAlkesItemsByTypeQuery(client: SupabaseClient<Database>, type:
 	return client
 		.from('alkes_items')
 		.select(
-			`id, name, type, facility, description, 
-        alkes ( 
+			`id, name, type, facility, description,
+        alkes (
         id, brand_name, packaging, creation_date, expiry_date, file_url,
         countries (
           code, name
@@ -76,20 +76,4 @@ export function getAlkesItemsByAlkesIdQuery(client: SupabaseClient<Database>, al
       )`,
 		)
 		.eq('id_alkes', alkesId)
-}
-
-export function updateAlkesQuery(
-	client: SupabaseClient<Database>,
-	id: Alkes['id'],
-	payload: Database['public']['Tables']['alkes']['Update'],
-) {
-	return client.from('alkes').update(payload).eq('id', id)
-}
-
-export function deleteAlkesQuery(client: SupabaseClient<Database>, id: Alkes['id']) {
-	return client.from('alkes').delete().eq('id', id)
-}
-
-export function deleteAlkesItemQuery(client: SupabaseClient<Database>, id: AlkesItem['id']) {
-	return client.from('alkes_items').delete().eq('id', id)
 }

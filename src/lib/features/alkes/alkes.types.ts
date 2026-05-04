@@ -3,7 +3,7 @@ import {
 	getAlkesItemsByAlkesIdQuery,
 	getAlkesItemsByTypeQuery,
 	getAlkesQuery,
-} from '@/lib/features/alkes/alkes-fetchers'
+} from './alkes-fetchers'
 
 import type { Tables } from '@/types/database.types'
 import type { QueryData } from '@supabase/supabase-js'

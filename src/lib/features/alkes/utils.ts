@@ -2,7 +2,7 @@ import { useQueryState } from 'nuqs'
 
 import { formatDate } from '@/lib/utils/utils'
 
-import type { AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
+import type { AlkesItemsByTypeWithCountriesAndHscode } from './alkes.types'
 
 export const useAlkesIdQueryString = () => {
 	return useQueryState('alkes-id')

@@ -1,16 +1,15 @@
 import { keepPreviousData, queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
+
 import {
-	deleteAlkesItemQuery,
-	deleteAlkesQuery,
 	getAlkesByIdQuery,
 	getAlkesItemsByAlkesIdQuery,
 	getAlkesItemsByTypeQuery,
 	getAlkesQuery,
-	updateAlkesQuery,
-} from '@/lib/features/alkes/alkes-fetchers'
-import { createClient as createBrowserClient } from '@/lib/supabase/client'
+} from './alkes-fetchers'
+import { deleteAlkesItemQuery, deleteAlkesQuery, updateAlkesQuery } from './alkes-mutations'
 
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -92,6 +91,11 @@ export function getAlkesItemsByTypeQueryOptions(type: AlkesItem['type']) {
 		},
 		enabled: !!type,
 	})
+}
+
+export function useCreateAlkesMutation() {
+	const supabase = createBrowserClient()
+	const queryClient = useQueryClient()
 }
 
 export function useUpdateAlkesMutation(id: Alkes['id']) {

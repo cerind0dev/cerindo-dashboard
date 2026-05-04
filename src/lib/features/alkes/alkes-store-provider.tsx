@@ -4,10 +4,10 @@ import React, { createContext, useContext, useState } from 'react'
 
 import { useStore } from 'zustand'
 
-import { createAlkesStore } from '@/lib/features/alkes/alkes-store'
+import { createAlkesStore } from './alkes-store'
 
-import type { AlkesStore } from '@/lib/features/alkes/alkes-store'
-import type { Alkes } from '@/lib/features/alkes/alkes.types'
+import type { AlkesStore } from './alkes-store'
+import type { Alkes } from './alkes.types'
 
 export type AlkesStoreApi = ReturnType<typeof createAlkesStore>
 

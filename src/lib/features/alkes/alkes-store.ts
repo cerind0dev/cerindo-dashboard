@@ -1,11 +1,12 @@
 import { saveAs } from 'file-saver'
 import { createStore } from 'zustand'
 
-import { ALKES_WORKSHEETS, mapAlkesToExcelRow } from '@/lib/features/alkes/utils'
 import { downloadExcelJS } from '@/lib/utils/excel-utils'
 import { formatDate } from '@/lib/utils/utils'
 
-import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
+import { ALKES_WORKSHEETS, mapAlkesToExcelRow } from './utils'
+
+import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from './alkes.types'
 
 export type AlkesState = {
 	alkesItems: AlkesItemsByTypeWithCountriesAndHscode[number][]
