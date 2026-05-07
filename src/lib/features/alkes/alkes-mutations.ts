@@ -2,7 +2,7 @@ import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Alkes, AlkesItem } from './alkes.types'
 
-export function createAlkesQuery(
+export function createAlkesMutation(
 	client: SupabaseClient<Database>,
 	payload: Database['public']['Tables']['alkes']['Insert'],
 ) {

@@ -9,7 +9,7 @@ import {
 	getAlkesItemsByTypeQuery,
 	getAlkesQuery,
 } from './alkes-fetchers'
-import { deleteAlkesItemQuery, deleteAlkesQuery, updateAlkesQuery } from './alkes-mutations'
+import { createAlkesMutation, deleteAlkesItemQuery, deleteAlkesQuery, updateAlkesQuery } from './alkes-mutations'
 
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -96,6 +96,27 @@ export function getAlkesItemsByTypeQueryOptions(type: AlkesItem['type']) {
 export function useCreateAlkesMutation() {
 	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: async (alkes: Database['public']['Tables']['alkes']['Insert']) => {
+			const response = await createAlkesMutation(supabase, alkes)
+			if (response.error) {
+				throw response.error
+			}
+		},
+		onSuccess: () => {
+			toast.success('Alkes berhasil ditambahkan', { position: 'top-right' })
+		},
+		onError: () => {
+			toast.success('Gagal menambahkan alkes', { position: 'top-right' })
+		},
+		onSettled: () => {
+			return queryClient.invalidateQueries({
+				queryKey: queryKeys.all(),
+				exact: false,
+			})
+		},
+	})
 }
 
 export function useUpdateAlkesMutation(id: Alkes['id']) {

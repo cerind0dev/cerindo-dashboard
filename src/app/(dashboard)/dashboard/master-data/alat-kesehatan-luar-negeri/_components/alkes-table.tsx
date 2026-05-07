@@ -26,6 +26,7 @@ import { SheetTrigger } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import AlkesItemsTable from './alkes-items-table'
+import CreateAlkesForm from './forms/create-alkes-form'
 
 import type { AlkesWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { Row } from '@tanstack/react-table'
@@ -211,7 +212,9 @@ export default function AlkesTable() {
 			emptyDataText="Tidak ada data alkes"
 			renderRowDetails={(row) => <AlkesTableRowDetail row={row} />}
 		>
-			<DataTableToolbar table={table} className="border-b px-6 py-3" />
+			<DataTableToolbar table={table} className="border-b px-6 py-3">
+				<CreateAlkesForm />
+			</DataTableToolbar>
 		</DataTable>
 	)
 }
