@@ -9,7 +9,7 @@ export function createAlkesMutation(
 	return client.from('alkes').insert(payload)
 }
 
-export function updateAlkesQuery(
+export function updateAlkesMutation(
 	client: SupabaseClient<Database>,
 	id: Alkes['id'],
 	payload: Database['public']['Tables']['alkes']['Update'],
@@ -17,10 +17,10 @@ export function updateAlkesQuery(
 	return client.from('alkes').update(payload).eq('id', id)
 }
 
-export function deleteAlkesQuery(client: SupabaseClient<Database>, id: Alkes['id']) {
+export function deleteAlkesMutation(client: SupabaseClient<Database>, id: Alkes['id']) {
 	return client.from('alkes').delete().eq('id', id)
 }
 
-export function deleteAlkesItemQuery(client: SupabaseClient<Database>, id: AlkesItem['id']) {
+export function deleteAlkesItemMutation(client: SupabaseClient<Database>, id: AlkesItem['id']) {
 	return client.from('alkes_items').delete().eq('id', id)
 }

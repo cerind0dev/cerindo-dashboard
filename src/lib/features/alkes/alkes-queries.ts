@@ -9,7 +9,12 @@ import {
 	getAlkesItemsByTypeQuery,
 	getAlkesQuery,
 } from './alkes-fetchers'
-import { createAlkesMutation, deleteAlkesItemQuery, deleteAlkesQuery, updateAlkesQuery } from './alkes-mutations'
+import {
+	createAlkesMutation,
+	deleteAlkesItemMutation,
+	deleteAlkesMutation,
+	updateAlkesMutation,
+} from './alkes-mutations'
 
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -125,7 +130,7 @@ export function useUpdateAlkesMutation(id: Alkes['id']) {
 
 	return useMutation({
 		mutationFn: async (updated: Database['public']['Tables']['alkes']['Update']) => {
-			const response = await updateAlkesQuery(supabase, id, updated)
+			const response = await updateAlkesMutation(supabase, id, updated)
 			if (response.error) {
 				throw response.error
 			}
@@ -152,7 +157,7 @@ export function useDeleteAlkesMutation(id: Alkes['id']) {
 
 	return useMutation({
 		mutationFn: async () => {
-			const response = await deleteAlkesQuery(supabase, id)
+			const response = await deleteAlkesMutation(supabase, id)
 			if (response.error) {
 				throw response.error
 			}
@@ -194,7 +199,7 @@ export function useDeleteAlkesItemMutation(id: AlkesItem['id']) {
 
 	return useMutation({
 		mutationFn: async () => {
-			const response = await deleteAlkesItemQuery(supabase, id)
+			const response = await deleteAlkesItemMutation(supabase, id)
 			if (response.error) {
 				throw response.error
 			}
