@@ -65,11 +65,21 @@ function SearchAlkesRowDetail({ row }: SearchAlkesRowDetailProps) {
 							<p className="mt-1 text-sm text-primary/85">{data.alkes.countries.code}</p>
 						</div>
 					</div>
-					<div className="rounded border border-primary/15 px-2.5 py-2 shadow">
-						<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
-							Deskripsi di alkes
-						</p>
-						<p className="mt-1 truncate text-sm text-primary/85">{data.name !== null ? data.name : '-'}</p>
+					<div className="grid grid-cols-2 gap-4">
+						<div className="col-span-2 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-1">
+							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+								Deskripsi di invoice
+							</p>
+							<p className="mt-1 truncate text-sm text-primary/85">
+								{data.description !== null ? data.description : '-'}
+							</p>{' '}
+						</div>
+						<div className="col-span-2 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-1">
+							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+								Deskripsi di alkes
+							</p>
+							<p className="mt-1 truncate text-sm text-primary/85">{data.name !== null ? data.name : '-'}</p>{' '}
+						</div>
 					</div>
 				</div>
 				<div className="col-span-12 space-y-4 xl:col-span-3">
@@ -160,7 +170,7 @@ export default function SearchAlkesTable() {
 			}),
 			columnHelper.accessor('name', {
 				id: 'alkes-item-name',
-				header: () => <DataTableColumnHeader title="Deskripsi" />,
+				header: () => <DataTableColumnHeader title="Deskripsi di alkes" />,
 				cell: (info) => {
 					return <span>{info.getValue()}</span>
 				},
