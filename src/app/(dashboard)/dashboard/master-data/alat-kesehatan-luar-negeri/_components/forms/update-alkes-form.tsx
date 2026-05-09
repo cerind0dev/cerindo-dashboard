@@ -87,8 +87,20 @@ export default function UpdateAlkesForm({ className, alkes, onActionSuccess, ...
 	})
 
 	const handleDeleteAlkes = async () => {
+		const supabase = createClient()
+
 		try {
 			await deleteAlkesMutation.mutateAsync()
+
+			if (alkes.file_url) {
+				try {
+					await deleteAlkesFile(supabase, alkes.file_url)
+				} catch (storageError: unknown) {
+					toast.error(getErrorMessage(storageError) || 'Gagal menghapus berkas alkes', { position: 'top-right' })
+					return
+				}
+			}
+
 			setShowDeleteDialog(false)
 			onActionSuccess?.()
 		} catch {
