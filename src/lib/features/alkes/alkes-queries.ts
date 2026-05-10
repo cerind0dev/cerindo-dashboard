@@ -10,6 +10,7 @@ import {
 	getAlkesQuery,
 } from './alkes-fetchers'
 import {
+	createAlkesItemMutation,
 	createAlkesMutation,
 	deleteAlkesItemMutation,
 	deleteAlkesMutation,
@@ -114,6 +115,32 @@ export function useCreateAlkesMutation() {
 		},
 		onError: () => {
 			toast.success('Gagal menambahkan alkes', { position: 'top-right' })
+		},
+		onSettled: () => {
+			return queryClient.invalidateQueries({
+				queryKey: queryKeys.all(),
+				exact: false,
+			})
+		},
+	})
+}
+
+export function useCreateAlkesItemMutation() {
+	const supabase = createBrowserClient()
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: async (alkesItem: Database['public']['Tables']['alkes_items']['Insert']) => {
+			const response = await createAlkesItemMutation(supabase, alkesItem)
+			if (response.error) {
+				throw response.error
+			}
+		},
+		onSuccess: () => {
+			toast.success('Item alkes berhasil ditambahkan', { position: 'top-right' })
+		},
+		onError: () => {
+			toast.success('Gagal menambahkan item alkes', { position: 'top-right' })
 		},
 		onSettled: () => {
 			return queryClient.invalidateQueries({

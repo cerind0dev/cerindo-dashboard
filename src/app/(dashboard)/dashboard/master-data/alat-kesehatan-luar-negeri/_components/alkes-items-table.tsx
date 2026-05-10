@@ -26,6 +26,8 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 
+import CreateAlkesItemForm from './forms/create-alkes-item-form'
+
 import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { Row } from '@tanstack/react-table'
 
@@ -35,7 +37,6 @@ interface AlkesItemsTableRowDetailProps {
 
 function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 	const data = row.original
-	const normalizedAlkesItemId = data.id.split('_')[0]
 
 	const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false)
 	const deleteAlkesItemMutation = useDeleteAlkesItemMutation(data.id)
@@ -175,10 +176,10 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 					</DialogTrigger>
 					<DialogContent>
 						<DialogHeader>
-							<DialogTitle>Delete item {`${normalizedAlkesItemId}`}?</DialogTitle>
+							<DialogTitle>Delete item {`${data.type}`}?</DialogTitle>
 							<DialogDescription>
-								Apakah Anda yakin akan menghapus <strong>{`${normalizedAlkesItemId}`}?</strong> Data item akan dihapus
-								secara permanen
+								Apakah Anda yakin akan menghapus <strong>{`${data.type}`}?</strong> Data item akan dihapus secara
+								permanen
 							</DialogDescription>
 						</DialogHeader>
 						<DialogFooter>
@@ -303,7 +304,9 @@ export default function AlkesItemsTable({ alkesId }: AlkesItemsTableProps) {
 			emptyDataText="Alkes ini tidak memiliki item terdaftar"
 			renderRowDetails={(row) => <AlkesItemsTableRowDetail row={row} />}
 		>
-			<DataTableToolbar table={table} className="border-b px-6 py-3" />
+			<DataTableToolbar table={table} className="border-b px-6 py-3">
+				<CreateAlkesItemForm alkesId={alkesId} />
+			</DataTableToolbar>
 		</DataTable>
 	)
 }

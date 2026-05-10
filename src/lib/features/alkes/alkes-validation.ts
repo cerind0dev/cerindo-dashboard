@@ -43,6 +43,22 @@ export const createAlkesFormOptions = formOptions({
 	},
 })
 
+export const createAlkesItemSchema = z.object({
+	type: z.string({ error: 'A valid item type is required' }),
+	name: z.string().nullable(),
+	facility: z.string().nullable(),
+	description: z.string().nullable(),
+})
+
+export const createAlkesItemFormOptions = formOptions({
+	defaultValues: {
+		type: '',
+		name: null as string | null,
+		facility: null as string | null,
+		description: null as string | null,
+	},
+})
+
 export const updateAlkesSchema = z
 	.object({
 		brandName: z.string().nullable(),

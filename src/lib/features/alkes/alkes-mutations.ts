@@ -9,6 +9,13 @@ export function createAlkesMutation(
 	return client.from('alkes').insert(payload)
 }
 
+export function createAlkesItemMutation(
+	client: SupabaseClient<Database>,
+	payload: Database['public']['Tables']['alkes_items']['Insert'],
+) {
+	return client.from('alkes_items').insert(payload)
+}
+
 export function updateAlkesMutation(
 	client: SupabaseClient<Database>,
 	id: Alkes['id'],
