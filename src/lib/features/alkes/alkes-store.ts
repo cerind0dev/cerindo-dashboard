@@ -1,4 +1,5 @@
 import { saveAs } from 'file-saver'
+import { nanoid } from 'nanoid'
 import { createStore } from 'zustand'
 
 import { downloadExcelJS } from '@/lib/utils/excel-utils'
@@ -39,8 +40,9 @@ export const createAlkesStore = (initialState: AlkesState = defaultInitialState)
 		actions: {
 			addAlkesItem: (item) =>
 				set((state) => {
+					const modifiedId = item.id + '_nano_' + nanoid(10)
 					return {
-						alkesItems: [...state.alkesItems, { ...item }],
+						alkesItems: [...state.alkesItems, { ...item, id: modifiedId }],
 					}
 				}),
 			deleteAlkesItem: (id) =>
