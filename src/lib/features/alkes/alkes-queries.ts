@@ -14,6 +14,7 @@ import {
 	createAlkesMutation,
 	deleteAlkesItemMutation,
 	deleteAlkesMutation,
+	updateAlkesItemMutation,
 	updateAlkesMutation,
 } from './alkes-mutations'
 
@@ -174,6 +175,35 @@ export function useUpdateAlkesMutation(id: Alkes['id']) {
 		onError: (error) => {
 			const message = error.message || 'An unexpected error occurred'
 			toast.error(`Gagal memperbarui ${id.split('_').join(' ')}: ${message}`, { position: 'top-right' })
+		},
+	})
+}
+
+export function useUpdateAlkesItemMutation(id: AlkesItem['id']) {
+	const supabase = createBrowserClient()
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: async (updated: Database['public']['Tables']['alkes_items']['Update']) => {
+			const response = await updateAlkesItemMutation(supabase, id, updated)
+			if (response.error) {
+				throw response.error
+			}
+
+			return response.data
+		},
+		onSuccess: async (data) => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(data[0].id_alkes) }),
+				queryClient.invalidateQueries({ queryKey: queryKeys.all(), exact: false }),
+				queryClient.invalidateQueries({ queryKey: queryKeys.getAlkesItemsByType(data[0].type) }),
+			])
+
+			toast.success(`Item alkes tipe ${data[0].type} berhasil diperbarui`, { position: 'top-right' })
+		},
+		onError: (error, data) => {
+			const message = error.message || 'An unexpected error occurred'
+			toast.error(`Gagal memperbarui item alkes tipe ${data.type}: ${message}`, { position: 'top-right' })
 		},
 	})
 }

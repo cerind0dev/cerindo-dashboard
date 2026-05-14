@@ -24,6 +24,14 @@ export function updateAlkesMutation(
 	return client.from('alkes').update(payload).eq('id', id)
 }
 
+export function updateAlkesItemMutation(
+	client: SupabaseClient<Database>,
+	id: AlkesItem['id'],
+	payload: Database['public']['Tables']['alkes_items']['Update'],
+) {
+	return client.from('alkes_items').update(payload).eq('id', id).select()
+}
+
 export function deleteAlkesMutation(client: SupabaseClient<Database>, id: Alkes['id']) {
 	return client.from('alkes').delete().eq('id', id)
 }

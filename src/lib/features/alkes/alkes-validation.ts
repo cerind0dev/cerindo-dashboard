@@ -1,7 +1,7 @@
 import { formOptions } from '@tanstack/react-form-nextjs'
 import z from 'zod'
 
-import { AlkesByIdWithCountriesAndHscode } from './alkes.types'
+import type { AlkesByIdWithCountriesAndHscode, AlkesItemsByAlkesIdWithCountriesAndHscode } from './alkes.types'
 
 function isExpired(creationDate: string, expiryDate: string) {
 	return new Date(expiryDate) > new Date(creationDate)
@@ -90,5 +90,24 @@ export const updateAlkesFormOptions = (fromDatabase: AlkesByIdWithCountriesAndHs
 			fileUrl: fromDatabase.file_url,
 			countryId: fromDatabase.countries.id,
 			hscodeId: fromDatabase.hscode.id,
+		},
+	})
+
+export const updateAlkesItemSchema = z.object({
+	type: z.string({ error: 'A valid item type is required' }),
+	name: z.string().nullable(),
+	facility: z.string().nullable(),
+	description: z.string().nullable(),
+})
+
+export const updateAlkesItemFormOptions = (
+	fromDatabase: Pick<AlkesItemsByAlkesIdWithCountriesAndHscode[number], 'type' | 'name' | 'facility' | 'description'>,
+) =>
+	formOptions({
+		defaultValues: {
+			type: fromDatabase.type,
+			name: fromDatabase.name,
+			facility: fromDatabase.facility,
+			description: fromDatabase.description,
 		},
 	})

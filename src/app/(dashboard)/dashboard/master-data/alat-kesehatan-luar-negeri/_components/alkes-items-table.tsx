@@ -2,10 +2,17 @@
 
 import React, { useMemo, useState } from 'react'
 
+import { useForm } from '@tanstack/react-form-nextjs'
 import { useQuery } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { getAlkesItemsByAlkesIdQueryOptions, useDeleteAlkesItemMutation } from '@/lib/features/alkes/alkes-queries'
+import {
+	getAlkesItemsByAlkesIdQueryOptions,
+	useDeleteAlkesItemMutation,
+	useUpdateAlkesItemMutation,
+} from '@/lib/features/alkes/alkes-queries'
+import { updateAlkesItemFormOptions, updateAlkesItemSchema } from '@/lib/features/alkes/alkes-validation'
+import { cn } from '@/lib/utils/utils'
 
 import useDataTable from '@/hooks/use-data-table'
 import { DataTable } from '@/components/data-table/data-table'
@@ -24,6 +31,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
+import { Field, FieldError } from '@/components/ui/field'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import CreateAlkesItemForm from './forms/create-alkes-item-form'
@@ -31,15 +40,22 @@ import CreateAlkesItemForm from './forms/create-alkes-item-form'
 import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { Row } from '@tanstack/react-table'
 
-interface AlkesItemsTableRowDetailProps {
+interface AlkesItemsTableRowDetailProps extends React.ComponentProps<'form'> {
 	row: Row<AlkesItemsByTypeWithCountriesAndHscode[number]>
 }
 
-function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
+function AlkesItemsTableRowDetail({ row, className, ...props }: AlkesItemsTableRowDetailProps) {
 	const data = row.original
+	const fieldCanBeUpdated = {
+		type: data.type,
+		name: data.name,
+		facility: data.facility,
+		description: data.description,
+	}
 
 	const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false)
 	const deleteAlkesItemMutation = useDeleteAlkesItemMutation(data.id)
+	const updateAlkesItemMutation = useUpdateAlkesItemMutation(data.id)
 
 	const handleDeleteAlkesItem = async () => {
 		try {
@@ -50,8 +66,34 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 		}
 	}
 
+	const form = useForm({
+		...updateAlkesItemFormOptions(fieldCanBeUpdated),
+		validators: { onSubmitAsync: updateAlkesItemSchema },
+		onSubmit: async ({ value }) => {
+			try {
+				await updateAlkesItemMutation.mutateAsync({
+					type: value.type,
+					name: value.name?.trim() === '' ? null : value.name,
+					facility: value.facility?.trim() === '' ? null : value.facility,
+					description: value.description?.trim() === '' ? null : value.description,
+				})
+			} catch {
+				return
+			}
+		},
+	})
+
 	return (
-		<React.Fragment>
+		<form
+			id="update-alkes-item-form"
+			onSubmit={(event) => {
+				event.preventDefault()
+				event.stopPropagation()
+				form.handleSubmit()
+			}}
+			className={cn(className)}
+			{...props}
+		>
 			<div className="grid grid-cols-12 gap-5 bg-white px-6 py-8">
 				<div className="col-span-12 space-y-4 xl:col-span-6">
 					<div className="grid grid-cols-4 gap-4">
@@ -59,10 +101,36 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">Kode AKL</p>
 							<p className="mt-1 text-sm text-primary/85">{data.alkes.id.split('_').join(' ')}</p>
 						</div>
-						<div className="col-span-4 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-1">
-							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">Tipe</p>
-							<p className="mt-1 text-sm text-primary/85">{data.type}</p>
-						</div>
+						<form.Field name="type" defaultValue={fieldCanBeUpdated.type}>
+							{(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+
+								return (
+									<Field data-invalid={isInvalid} className="col-span-4 sm:col-span-1">
+										<InputGroup className="h-auto rounded border border-primary/15 shadow">
+											<InputGroupInput
+												id={field.name}
+												name={field.name}
+												value={field.state.value}
+												type="text"
+												onBlur={field.handleBlur}
+												onChange={(event) => field.handleChange(event.target.value)}
+												aria-invalid={isInvalid}
+												autoComplete="off"
+												className="mt-1 px-2.5 pt-0! pb-2! text-sm text-primary/85"
+											/>
+											<InputGroupAddon align="block-start" className="px-2.5 pt-2! pb-0!">
+												<InputGroupText className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+													Tipe
+												</InputGroupText>
+												<InputGroupText className="ml-auto text-xs font-light">*bisa diupdate</InputGroupText>
+											</InputGroupAddon>
+										</InputGroup>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						</form.Field>
 						<div className="col-span-4 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-1">
 							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">HS Code</p>
 							<p className="mt-1 text-sm text-primary/85">{data.alkes.hscode.code}</p>
@@ -91,20 +159,68 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 						</div>
 					</div>
 					<div className="grid grid-cols-2 gap-4">
-						<div className="col-span-2 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-1">
-							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
-								Deskripsi di invoice
-							</p>
-							<p className="mt-1 truncate text-sm text-primary/85">
-								{data.description !== null ? data.description : '-'}
-							</p>{' '}
-						</div>
-						<div className="col-span-2 rounded border border-primary/15 px-2.5 py-2 shadow sm:col-span-1">
-							<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
-								Deskripsi di alkes
-							</p>
-							<p className="mt-1 truncate text-sm text-primary/85">{data.name !== null ? data.name : '-'}</p>{' '}
-						</div>
+						<form.Field name="description" defaultValue={fieldCanBeUpdated.description}>
+							{(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+
+								return (
+									<Field data-invalid={isInvalid} className="col-span-2 sm:col-span-1">
+										<InputGroup className="h-auto rounded border border-primary/15 shadow">
+											<InputGroupInput
+												id={field.name}
+												name={field.name}
+												value={field.state.value ?? ''}
+												placeholder="-"
+												type="text"
+												onBlur={field.handleBlur}
+												onChange={(event) => field.handleChange(event.target.value)}
+												aria-invalid={isInvalid}
+												autoComplete="off"
+												className="mt-1 truncate px-2.5 pt-0! pb-2! text-sm text-primary/85"
+											/>
+											<InputGroupAddon align="block-start" className="px-2.5 pt-2! pb-0!">
+												<InputGroupText className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+													Deskripsi di invoice
+												</InputGroupText>
+												<InputGroupText className="ml-auto text-xs font-light">*bisa diupdate</InputGroupText>
+											</InputGroupAddon>
+										</InputGroup>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						</form.Field>
+						<form.Field name="name" defaultValue={fieldCanBeUpdated.name}>
+							{(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+
+								return (
+									<Field className="col-span-2 sm:col-span-1">
+										<InputGroup className="h-auto rounded border border-primary/15 shadow">
+											<InputGroupInput
+												id={field.name}
+												name={field.name}
+												value={field.state.value ?? ''}
+												placeholder="-"
+												type="text"
+												onBlur={field.handleBlur}
+												onChange={(event) => field.handleChange(event.target.value)}
+												aria-invalid={isInvalid}
+												autoComplete="off"
+												className="mt-1 truncate px-2.5 pt-0! pb-2! text-sm text-primary/85"
+											/>
+											<InputGroupAddon align="block-start" className="px-2.5 pt-2! pb-0!">
+												<InputGroupText className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+													Deskripsi di alkes
+												</InputGroupText>
+												<InputGroupText className="ml-auto text-xs font-light">*bisa diupdate</InputGroupText>
+											</InputGroupAddon>
+										</InputGroup>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						</form.Field>
 					</div>
 				</div>
 				<div className="col-span-12 space-y-4 xl:col-span-3">
@@ -155,10 +271,37 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 							{new Date(String(data.alkes.expiry_date)).toLocaleDateString('id')}
 						</p>
 					</div>
-					<div className="rounded border border-primary/15 px-2.5 py-2 shadow">
-						<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">Fasilitas</p>
-						<p className="mt-1 text-sm text-primary/85">{data.facility !== null ? data.facility : '-'}</p>
-					</div>
+					<form.Field name="facility" defaultValue={fieldCanBeUpdated.facility}>
+						{(field) => {
+							const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+
+							return (
+								<Field>
+									<InputGroup className="h-auto rounded border border-primary/15 shadow">
+										<InputGroupInput
+											id={field.name}
+											name={field.name}
+											value={field.state.value ?? ''}
+											placeholder="-"
+											type="text"
+											onBlur={field.handleBlur}
+											onChange={(event) => field.handleChange(event.target.value)}
+											aria-invalid={isInvalid}
+											autoComplete="off"
+											className="mt-1 truncate px-2.5 pt-0 pb-2! text-sm text-primary/85"
+										/>
+										<InputGroupAddon align="block-start" className="px-2.5 pt-2 pb-0!">
+											<InputGroupText className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">
+												Fasilitas
+											</InputGroupText>
+											<InputGroupText className="ml-auto text-xs font-light">*bisa diupdate</InputGroupText>
+										</InputGroupAddon>
+									</InputGroup>
+									{isInvalid && <FieldError errors={field.state.meta.errors} />}
+								</Field>
+							)
+						}}
+					</form.Field>
 					<div className="rounded border border-primary/15 px-2.5 py-2 shadow">
 						<p className="text-left text-sm leading-4.5 font-semibold tracking-normal text-primary">Lartas</p>
 						<p className="mt-1 text-sm text-primary/85">
@@ -205,8 +348,20 @@ function AlkesItemsTableRowDetail({ row }: AlkesItemsTableRowDetailProps) {
 						</DialogFooter>
 					</DialogContent>
 				</Dialog>
+				<form.Subscribe selector={(formState) => [formState.canSubmit, formState.isSubmitting]}>
+					{([canSubmit, isSubmitting]) => {
+						return (
+							<Field className="w-max">
+								<Button type="submit" disabled={!canSubmit} variant="outline">
+									{isSubmitting && <Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+									Update
+								</Button>
+							</Field>
+						)
+					}}
+				</form.Subscribe>
 			</div>
-		</React.Fragment>
+		</form>
 	)
 }
 
