@@ -58,8 +58,8 @@ export default function CreateAlkesForm({ className, ...props }: React.Component
 
 				await createAlkesMutation.mutateAsync({
 					id: idAlkes,
-					brand_name: value.brandName,
-					packaging: value.packaging,
+					brand_name: value.brandName?.trim() === '' ? null : value.brandName,
+					packaging: value.packaging?.trim() === '' ? null : value.packaging,
 					creation_date: value.creationDate,
 					expiry_date: value.expiryDate,
 					file_url: value.fileUrl,
@@ -141,6 +141,7 @@ export default function CreateAlkesForm({ className, ...props }: React.Component
 														id={field.name}
 														name={field.name}
 														value={field.state.value ?? ''}
+														placeholder="-"
 														type="text"
 														onBlur={field.handleBlur}
 														onChange={(event) => field.handleChange(event.target.value)}
@@ -163,6 +164,7 @@ export default function CreateAlkesForm({ className, ...props }: React.Component
 														id={field.name}
 														name={field.name}
 														value={field.state.value ?? ''}
+														placeholder="-"
 														type="text"
 														onBlur={field.handleBlur}
 														onChange={(event) => field.handleChange(event.target.value)}

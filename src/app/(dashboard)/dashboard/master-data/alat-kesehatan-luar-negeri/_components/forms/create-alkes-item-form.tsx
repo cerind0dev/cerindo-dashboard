@@ -40,9 +40,9 @@ export default function CreateAlkesItemForm({ alkesId, className, ...props }: Cr
 			try {
 				await createAlkesItemMutation.mutateAsync({
 					type: value.type,
-					name: value.name,
-					facility: value.facility,
-					description: value.description,
+					name: value.name?.trim() === '' ? null : value.name,
+					facility: value.facility?.trim() === '' ? null : value.facility,
+					description: value.description?.trim() === '' ? null : value.description,
 					id_alkes: alkesId,
 				})
 
@@ -96,6 +96,7 @@ export default function CreateAlkesItemForm({ alkesId, className, ...props }: Cr
 														name={field.name}
 														value={field.state.value ?? ''}
 														type="text"
+														placeholder="Masukkan tipe item tertera di lampiran alkes"
 														onBlur={field.handleBlur}
 														onChange={(event) => field.handleChange(event.target.value)}
 														aria-invalid={isInvalid}
@@ -118,6 +119,7 @@ export default function CreateAlkesItemForm({ alkesId, className, ...props }: Cr
 														id={field.name}
 														name={field.name}
 														value={field.state.value ?? ''}
+														placeholder="-"
 														type="text"
 														onBlur={field.handleBlur}
 														onChange={(event) => field.handleChange(event.target.value)}
@@ -164,6 +166,7 @@ export default function CreateAlkesItemForm({ alkesId, className, ...props }: Cr
 														id={field.name}
 														name={field.name}
 														value={field.state.value ?? ''}
+														placeholder="-"
 														type="text"
 														onBlur={field.handleBlur}
 														onChange={(event) => field.handleChange(event.target.value)}
