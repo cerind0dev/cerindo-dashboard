@@ -10,7 +10,9 @@ function isExpired(creationDate: string, expiryDate: string) {
 export const createAlkesSchema = z
 	.object({
 		alkesNumber: z
-			.string({ error: 'A valid alkes number is required' })
+			.string()
+			.trim()
+			.min(1, { error: 'A valid alkes number is required' })
 			.regex(/^AKL \d+$/, { error: 'Alkes number must follow the format: AKL [numbers] (e.g., AKL 1234567)' }),
 		brandName: z.string().nullable(),
 		packaging: z.string().nullable(),
@@ -20,7 +22,7 @@ export const createAlkesSchema = z
 			.file({ error: 'You have to provide the alkes file' })
 			.max(5_000_000, { error: 'Maximum size of the alkes file is 5 MB' })
 			.mime(['application/pdf'], { error: 'Alkes file must be a .pdf file' }),
-		fileUrl: z.string({ error: 'A valid file name is required' }),
+		fileUrl: z.string().trim().min(1, { error: 'A valid file name is required' }),
 		countryId: z.uuid({ error: 'Please select a valid country' }),
 		hscodeId: z.uuid({ error: 'Please select a valid HS code' }),
 	})
@@ -44,7 +46,7 @@ export const createAlkesFormOptions = formOptions({
 })
 
 export const createAlkesItemSchema = z.object({
-	type: z.string({ error: 'A valid item type is required' }),
+	type: z.string().trim().min(1, { error: 'A valid item type is required' }),
 	name: z.string().nullable(),
 	facility: z.string().nullable(),
 	description: z.string().nullable(),
@@ -70,7 +72,7 @@ export const updateAlkesSchema = z
 			.max(5_000_000, { error: 'Maximum size of the alkes file is 5 MB' })
 			.mime(['application/pdf'], { error: 'Alkes file must be a .pdf file' })
 			.nullable(),
-		fileUrl: z.string({ error: 'A valid file name is required' }),
+		fileUrl: z.string().trim().min(1, { error: 'A valid file name is required' }),
 		countryId: z.uuid({ error: 'Please select a valid country' }),
 		hscodeId: z.uuid({ error: 'Please select a valid HS code' }),
 	})
@@ -94,7 +96,7 @@ export const updateAlkesFormOptions = (fromDatabase: AlkesByIdWithCountriesAndHs
 	})
 
 export const updateAlkesItemSchema = z.object({
-	type: z.string({ error: 'A valid item type is required' }),
+	type: z.string().trim().min(1, { error: 'A valid item type is required' }),
 	name: z.string().nullable(),
 	facility: z.string().nullable(),
 	description: z.string().nullable(),
