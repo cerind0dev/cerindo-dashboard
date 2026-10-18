@@ -4,8 +4,6 @@ import React from 'react'
 import Link from 'next/link'
 import { useSelectedLayoutSegments } from 'next/navigation'
 
-import { cn } from '@/lib/utils/utils'
-
 import Icons from '@/components/icons'
 import Logo from '@/components/logo'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -122,6 +120,12 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
 					title: 'Pencarian Alkes',
 					href: '/dashboard/search-alkes',
 					active: segments.includes('search-alkes'),
+					items: [],
+				},
+				{
+					title: 'Nokia',
+					href: '/dashboard/nokia',
+					active: segments.includes('nokia'),
 					items: [],
 				},
 			],

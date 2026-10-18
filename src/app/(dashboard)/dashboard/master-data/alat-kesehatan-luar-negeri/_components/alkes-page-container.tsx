@@ -25,9 +25,6 @@ export default function AlkesPageContainer() {
 						</PageHeaderDescription>
 					</PageHeader>
 				</div>
-				{/**
-				 * TODO: add a way to add new alkes data
-				 */}
 				<AlkesTable />
 			</div>
 		</Sheet>

@@ -10,6 +10,7 @@ import { inter } from '@/config/font'
 import { siteConfig } from '@/config/site'
 import { AlkesStoreProvider } from '@/lib/features/alkes/alkes-store-provider'
 import { AuthStoreProvider } from '@/lib/features/auth/auth-store-provider'
+import { NokiaStoreProvider } from '@/lib/features/nokia/nokia-store-provider'
 import QueryProvider from '@/lib/providers/query-provider'
 import { absoluteUrl } from '@/lib/utils/utils'
 
@@ -93,7 +94,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 				<QueryProvider>
 					<NuqsAdapter>
 						<AuthStoreProvider>
-							<AlkesStoreProvider>{children}</AlkesStoreProvider>
+							<AlkesStoreProvider>
+								<NokiaStoreProvider>{children}</NokiaStoreProvider>
+							</AlkesStoreProvider>
 						</AuthStoreProvider>
 					</NuqsAdapter>
 				</QueryProvider>
@@ -102,4 +105,3 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 		</html>
 	)
 }
-
