@@ -87,7 +87,7 @@ export const mapShipmentToExcelRow = (item: NokiaShipment, index: number) => ({
 	netWeight: Math.trunc(parseFloat(item.netWeight.replace(/,/g, '').trim()) * 100) / 100,
 	grossWeight: Math.trunc(parseFloat(item.grossWeight.replace(/,/g, '').trim()) * 100) / 100,
 	countryOrigin: item.countryOrigin,
-	description: item.description.toLocaleUpperCase(),
+	description: `${item.description}, SERIAL NO : ${item.numberSerialLeft}`.toUpperCase(),
 	hscode: item.hscode,
 	quantity: parseInt(item.quantity),
 	repairCharge: Math.trunc(parseFloat(item.repairCharge.replace(/,/g, '').trim()) * 100) / 100,

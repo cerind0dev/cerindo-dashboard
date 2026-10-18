@@ -13,7 +13,7 @@ export type NokiaState = {
 }
 
 export type NokiaActions = {
-	processShipment: (country: string, file: File) => Promise<void>
+	processShipment: (country: string, file: File, totalDataRows: number) => Promise<void>
 	exportShipmentToExcel: (shipment: NokiaShipment[]) => Promise<void>
 	clearAll: () => void
 }
@@ -28,8 +28,13 @@ export const createNokiaStore = (initialState: NokiaState = defaultInitialState)
 	return createStore<NokiaStore>()((set) => ({
 		...initialState,
 		actions: {
-			processShipment: async (country, file) => {
+			processShipment: async (country, file, totalDataRows) => {
 				const results = await processShipmentByCountry(country, file)
+
+				if (totalDataRows !== results.length) {
+					throw new Error('Jumlah item di dalam file terpilih berbeda dengan jumlah barang input')
+					return
+				}
 
 				set({
 					nokiaShipment: results,

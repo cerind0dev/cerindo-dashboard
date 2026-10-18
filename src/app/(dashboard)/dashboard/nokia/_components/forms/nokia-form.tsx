@@ -35,7 +35,7 @@ export default function NokiaForm({ className, ...props }: React.ComponentProps<
 			}
 
 			try {
-				await processShipment(value.shipperCountry, value.shipmentFile)
+				await processShipment(value.shipperCountry, value.shipmentFile, value.totalDataRows)
 			} catch (error) {
 				toast.error(getErrorMessage(error) || 'Gagal memproses file shipment', { position: 'top-right' })
 				return
@@ -82,38 +82,31 @@ export default function NokiaForm({ className, ...props }: React.ComponentProps<
 								)
 							}}
 						</form.Field>
-						<form.Subscribe selector={(state) => [state.values.shipperCountry]}>
-							{([shipperCountry]) =>
-								shipperCountry === 'india' ? (
-									<form.Field name="totalDataRows">
-										{(field) => {
-											const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+						<form.Field name="totalDataRows">
+							{(field) => {
+								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
-											return (
-												<Field data-invalid={isInvalid}>
-													<FieldLabel htmlFor={field.name}>Jumlah barang</FieldLabel>
-													<Input
-														id={field.name}
-														name={field.name}
-														type="number"
-														min={1}
-														value={field.state.value}
-														onBlur={field.handleBlur}
-														onChange={(event) => {
-															field.handleChange(Number(event.target.value))
-														}}
-														aria-invalid={isInvalid}
-														placeholder="contoh: 25"
-													/>
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel htmlFor={field.name}>Jumlah barang</FieldLabel>
+										<Input
+											id={field.name}
+											name={field.name}
+											type="number"
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(event) => {
+												field.handleChange(parseInt(event.target.value))
+											}}
+											aria-invalid={isInvalid}
+											placeholder="contoh: 25"
+										/>
 
-													{isInvalid && <FieldError errors={field.state.meta.errors} />}
-												</Field>
-											)
-										}}
-									</form.Field>
-								) : null
-							}
-						</form.Subscribe>
+										{isInvalid && <FieldError errors={field.state.meta.errors} />}
+									</Field>
+								)
+							}}
+						</form.Field>
 						<form.Field name="shipmentFile">
 							{(field) => {
 								const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
