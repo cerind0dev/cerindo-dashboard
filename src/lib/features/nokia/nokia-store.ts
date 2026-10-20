@@ -29,7 +29,7 @@ export const createNokiaStore = (initialState: NokiaState = defaultInitialState)
 		...initialState,
 		actions: {
 			processShipment: async (country, file, totalDataRows) => {
-				const results = await processShipmentByCountry(country, file)
+				const results = await processShipmentByCountry(country, file, totalDataRows)
 
 				if (totalDataRows !== results.length) {
 					throw new Error('Jumlah item di dalam file terpilih berbeda dengan jumlah barang input')

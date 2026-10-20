@@ -52,3 +52,14 @@ export const formatDate = (dateInput: string | Date): string => {
 	return `${day}-${month}-${year}`
 }
 
+export const roundToTwoDecimals = (value: string | number): number => {
+	const cleaned = typeof value === 'string' ? value.replace(/,/g, '').trim() : value
+
+	const amount = Number(cleaned)
+
+	if (cleaned === '' || !Number.isFinite(amount)) {
+		throw new Error(`Invalid numeric value: "${value}"`)
+	}
+
+	return Number(amount.toFixed(2))
+}

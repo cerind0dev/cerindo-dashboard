@@ -13,6 +13,30 @@ export type Filename = `${string}.xlsx`
 export type WorksheetName<T extends Array<Sheet>> = T[number]['name']
 export type Data<T extends Array<Sheet>> = Array<any> | Record<WorksheetName<T>, Array<any>>
 
+function cellToString(value: ExcelJS.CellValue): string {
+	if (value == null) return ''
+
+	if (value instanceof Date) {
+		return value.toISOString().slice(0, 10)
+	}
+
+	if (typeof value === 'object') {
+		if ('richText' in value && Array.isArray(value.richText)) {
+			return value.richText.map((part) => part.text).join('')
+		}
+
+		if ('text' in value && typeof value.text === 'string') {
+			return value.text
+		}
+
+		if ('result' in value) {
+			return cellToString(value.result as ExcelJS.CellValue)
+		}
+	}
+
+	return String(value)
+}
+
 async function makeBuffer<T extends Array<Sheet>>({
 	worksheets,
 	data,
@@ -55,4 +79,4 @@ async function downloadExcelJS<T extends Array<Sheet>>({
 	saveAs(blob, filename ?? 'workbook.xlsx')
 }
 
-export { downloadExcelJS }
+export { cellToString, downloadExcelJS }

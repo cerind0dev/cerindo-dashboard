@@ -1,7 +1,16 @@
 import type { BoundingBox } from './nokia.types'
 
+export const COUNTR_OF_ORIGIN: Partial<Record<string, string>> = {
+	India: 'IN',
+	China: 'CN',
+	Vietnam: 'VN',
+	Ukraine: 'UA',
+	Finland: 'FI',
+}
+
 export const HSCODE: Partial<Record<string, string>> = {
 	'8517620000': '85176299',
+	'85176290': '85176299',
 }
 
 export const INVOICE_COORDINATES = [
