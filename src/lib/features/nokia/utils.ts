@@ -6,7 +6,7 @@ import { extractTextItems, getDocumentProxy } from 'unpdf'
 import { cellToString } from '@/lib/utils/excel-utils'
 import { roundToTwoDecimals } from '@/lib/utils/utils'
 
-import { COUNTR_OF_ORIGIN, HSCODE, INVOICE_COORDINATES, PACKING_LIST_COORDINATES } from './nokia-data'
+import { COUNTRY_OF_ORIGIN, HSCODE, INVOICE_COORDINATES, PACKING_LIST_COORDINATES } from './nokia-data'
 
 import type { StructuredTextItem } from 'unpdf'
 import type { BoundingBox, NokiaShipment } from './nokia.types'
@@ -213,7 +213,7 @@ export function normalizeShipment(shipment: NokiaShipment, invoiceDateFormat: st
 		),
 		netWeight: shipment.netWeight.replace(/\s*KG\s*$/i, '').trim(),
 		grossWeight: shipment.grossWeight.replace(/\s*KG\s*$/i, '').trim(),
-		countryOrigin: COUNTR_OF_ORIGIN[shipment.countryOrigin.trim()] ?? shipment.countryOrigin.trim(),
+		countryOrigin: COUNTRY_OF_ORIGIN[shipment.countryOrigin.trim()] ?? shipment.countryOrigin.trim(),
 		description: shipment.description
 			.replace(/\b1\s+PC\b/i, '')
 			.replace(/\s+/g, ' ')

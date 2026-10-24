@@ -1,6 +1,6 @@
 import type { BoundingBox } from './nokia.types'
 
-export const COUNTR_OF_ORIGIN: Partial<Record<string, string>> = {
+export const COUNTRY_OF_ORIGIN: Partial<Record<string, string>> = {
 	India: 'IN',
 	China: 'CN',
 	Vietnam: 'VN',
