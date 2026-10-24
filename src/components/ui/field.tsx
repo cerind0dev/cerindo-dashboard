@@ -2,14 +2,14 @@
 
 import { useMemo } from 'react'
 
-import { cva } from 'class-variance-authority'
+import { cva } from 'cnfast'
 
 import { cn } from '@/lib/utils/utils'
 
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 
-import type { VariantProps } from 'class-variance-authority'
+import type { VariantProps } from 'cnfast'
 
 function FieldSet({ className, ...props }: React.ComponentProps<'fieldset'>) {
 	return (
@@ -228,4 +228,3 @@ export {
 	FieldContent,
 	FieldTitle,
 }
-

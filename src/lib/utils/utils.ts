@@ -1,16 +1,10 @@
 import { env } from '@/env'
-import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
 import z from 'zod'
 
-import type { ClassValue } from 'clsx'
+export { cn } from 'cnfast'
 
 export function absoluteUrl(path: string) {
 	return `${env.NEXT_PUBLIC_APP_URL}${path}`
-}
-
-export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs))
 }
 
 export function getErrorMessage(error: unknown): string {

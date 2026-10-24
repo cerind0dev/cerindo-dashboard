@@ -2,13 +2,13 @@
 
 import * as React from 'react'
 
-import { cva } from 'class-variance-authority'
+import { cva } from 'cnfast'
 import { PanelLeftIcon } from 'lucide-react'
 import { Slot } from 'radix-ui'
 
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils/utils'
 
-import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -16,7 +16,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
-import type { VariantProps } from 'class-variance-authority'
+import type { VariantProps } from 'cnfast'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

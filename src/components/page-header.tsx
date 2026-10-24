@@ -1,8 +1,8 @@
-import { cva } from 'class-variance-authority'
+import { cva } from 'cnfast'
 
 import { cn } from '@/lib/utils/utils'
 
-import type { VariantProps } from 'class-variance-authority'
+import type { VariantProps } from 'cnfast'
 
 // @see https://github.com/sadmann7/skateshop/blob/main/src/components/page-header.tsx
 
