@@ -6,8 +6,8 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import { useNokiaShipment } from '@/lib/features/nokia/nokia-store-provider'
 import { NokiaShipment } from '@/lib/features/nokia/nokia.types'
+import useDataTable from '@/lib/hooks/use-data-table'
 
-import useDataTable from '@/hooks/use-data-table'
 import { DataTable } from '@/components/data-table/data-table'
 import DataTableColumnHeader from '@/components/data-table/data-table-column-header'
 

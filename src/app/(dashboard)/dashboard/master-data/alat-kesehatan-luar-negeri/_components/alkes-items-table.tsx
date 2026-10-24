@@ -12,9 +12,9 @@ import {
 	useUpdateAlkesItemMutation,
 } from '@/lib/features/alkes/alkes-queries'
 import { updateAlkesItemFormOptions, updateAlkesItemSchema } from '@/lib/features/alkes/alkes-validation'
+import useDataTable from '@/lib/hooks/use-data-table'
 import { cn } from '@/lib/utils/utils'
 
-import useDataTable from '@/hooks/use-data-table'
 import { DataTable } from '@/components/data-table/data-table'
 import DataTableColumnHeader from '@/components/data-table/data-table-column-header'
 import DataTableToolbar from '@/components/data-table/data-table-toolbar'

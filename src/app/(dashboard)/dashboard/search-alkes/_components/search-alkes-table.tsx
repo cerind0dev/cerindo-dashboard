@@ -5,9 +5,9 @@ import React, { useMemo } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { useAlkesActions, useAlkesItems } from '@/lib/features/alkes/alkes-store-provider'
+import useDataTable from '@/lib/hooks/use-data-table'
 import { cn } from '@/lib/utils/utils'
 
-import useDataTable from '@/hooks/use-data-table'
 import { DataTable } from '@/components/data-table/data-table'
 import DataTableColumnHeader from '@/components/data-table/data-table-column-header'
 import Icons from '@/components/icons'
