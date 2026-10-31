@@ -4,16 +4,16 @@ import { downloadExcelJS } from '@/lib/utils/excel-utils'
 import { formatDate } from '@/lib/utils/utils'
 
 import { NOKIA_SHIPMENT_WORKSHEETS } from './nokia-data'
-import { mapShipmentToExcelRow, processShipmentByCountry } from './utils'
+import { mapShipmentToExcelRow, processShipment } from './utils'
 
-import type { NokiaShipment } from './nokia.types'
+import type { NokiaShipment, ShipmentDirection } from './nokia.types'
 
 export type NokiaState = {
 	nokiaShipment: NokiaShipment[]
 }
 
 export type NokiaActions = {
-	processShipment: (country: string, file: File, totalDataRows: number) => Promise<void>
+	processShipment: (direction: ShipmentDirection, country: string, file: File, totalDataRows: number) => Promise<void>
 	exportShipmentToExcel: (shipment: NokiaShipment[]) => Promise<void>
 	clearAll: () => void
 }
@@ -28,8 +28,8 @@ export const createNokiaStore = (initialState: NokiaState = defaultInitialState)
 	return createStore<NokiaStore>()((set) => ({
 		...initialState,
 		actions: {
-			processShipment: async (country, file, totalDataRows) => {
-				const results = await processShipmentByCountry(country, file, totalDataRows)
+			processShipment: async (direction, country, file, totalDataRows) => {
+				const results = await processShipment(direction, country, file, totalDataRows)
 
 				if (totalDataRows !== results.length) {
 					throw new Error('Jumlah item di dalam file terpilih berbeda dengan jumlah barang input')

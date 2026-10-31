@@ -12,4 +12,6 @@ export type NokiaShipmentField =
 	| (typeof INVOICE_COORDINATES)[number]['id']
 	| (typeof PACKING_LIST_COORDINATES)[number]['id']
 
+export type ShipmentDirection = 'import' | 'export'
+
 export type NokiaShipment = Record<NokiaShipmentField, string>

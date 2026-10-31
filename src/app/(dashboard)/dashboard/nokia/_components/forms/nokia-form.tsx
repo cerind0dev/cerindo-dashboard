@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useId } from 'react'
 
 import { useForm } from '@tanstack/react-form-nextjs'
 import { toast } from 'sonner'
@@ -23,7 +23,14 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 
-export default function NokiaForm({ className, ...props }: React.ComponentProps<'form'>) {
+import type { ShipmentDirection } from '@/lib/features/nokia/nokia.types'
+
+type NokiaFormProps = React.ComponentProps<'form'> & {
+	direction: ShipmentDirection
+}
+
+export default function NokiaForm({ className, direction, ...props }: NokiaFormProps) {
+	const formId = useId()
 	const { processShipment } = useNokiaActions()
 
 	const form = useForm({
@@ -35,7 +42,7 @@ export default function NokiaForm({ className, ...props }: React.ComponentProps<
 			}
 
 			try {
-				await processShipment(value.shipperCountry, value.shipmentFile, value.totalDataRows)
+				await processShipment(direction, value.shipperCountry, value.shipmentFile, value.totalDataRows)
 			} catch (error) {
 				toast.error(getErrorMessage(error) || 'Gagal memproses file shipment', { position: 'top-right' })
 				return
@@ -45,7 +52,7 @@ export default function NokiaForm({ className, ...props }: React.ComponentProps<
 
 	return (
 		<form
-			id="nokia-shipment-form"
+			id={`nokia-shipment-form-${formId}`}
 			onSubmit={(event) => {
 				event.preventDefault()
 				event.stopPropagation()
@@ -140,7 +147,7 @@ export default function NokiaForm({ className, ...props }: React.ComponentProps<
 					{([canSubmit, isSubmitting]) => {
 						return (
 							<React.Fragment>
-								<Button type="submit" form="nokia-shipment-form" disabled={!canSubmit} variant="default">
+								<Button type="submit" form={`nokia-shipment-form-${formId}`} disabled={!canSubmit} variant="default">
 									{isSubmitting && <Icons.loader className="mr-2 size-4 animate-spin" aria-hidden="true" />}
 									Proses
 								</Button>

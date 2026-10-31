@@ -5,9 +5,8 @@ import { rubik } from '@/config/font'
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from '@/components/page-header'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-import NokiaForm from './_components/forms/nokia-form'
-import NokiaShipmentFooter from './_components/nokia-shipment-footer'
-import NokiaShipmentTable from './_components/nokia-shipment-table'
+import NokiaExportPanel from './_components/nokia-export-panel'
+import NokiaImportPanel from './_components/nokia-import-panel'
 
 export default async function NokiaPage() {
 	return (
@@ -25,19 +24,11 @@ export default async function NokiaPage() {
 						<TabsTrigger value="export">Ekspor</TabsTrigger>
 					</TabsList>
 				</div>
-				<div className="border-b bg-primary/5 p-9">
-					<div className="rounded-md border bg-white shadow-xs">
-						<NokiaForm />
-					</div>
-				</div>
 				<TabsContent value="import">
-					<NokiaShipmentTable />
-					<NokiaShipmentFooter />
+					<NokiaImportPanel />
 				</TabsContent>
 				<TabsContent value="export" className="p-9">
-					<div className="m-6 rounded border-2 border-dashed border-primary/15 py-4 text-center">
-						<p className="text-sm font-medium">Work in progress</p>
-					</div>
+					<NokiaExportPanel />
 				</TabsContent>
 			</Tabs>
 		</div>

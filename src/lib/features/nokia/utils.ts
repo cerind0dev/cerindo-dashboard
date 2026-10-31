@@ -9,7 +9,7 @@ import { roundToTwoDecimals } from '@/lib/utils/utils'
 import { COUNTRY_OF_ORIGIN, HSCODE, INVOICE_COORDINATES, PACKING_LIST_COORDINATES } from './nokia-data'
 
 import type { StructuredTextItem } from 'unpdf'
-import type { BoundingBox, NokiaShipment } from './nokia.types'
+import type { BoundingBox, NokiaShipment, ShipmentDirection } from './nokia.types'
 
 const extractTextInBox = (pageItems: StructuredTextItem[], box: BoundingBox) => {
 	return pageItems
@@ -239,7 +239,7 @@ export const mapShipmentToExcelRow = (item: NokiaShipment, index: number) => ({
 	serialNumberDiff: item.numberSerialLeft === item.numberSerialRight ? 'SAMA' : 'TIDAK SAMA',
 })
 
-export async function processShipmentByCountry(country: string, file: File, totalDataRows: number) {
+export async function processImportShipment(country: string, file: File, totalDataRows: number) {
 	let shipments: NokiaShipment[]
 	let invoiceDateFormat: string
 
@@ -273,4 +273,20 @@ export async function processShipmentByCountry(country: string, file: File, tota
 	}
 
 	return normalizedShipments
+}
+
+export async function processShipment(
+	direction: ShipmentDirection,
+	country: string,
+	file: File,
+	totalDataRows: number,
+): Promise<NokiaShipment[]> {
+	switch (direction) {
+		case 'import':
+			return processImportShipment(country, file, totalDataRows)
+		case 'export':
+			throw new Error('Export shipment processing is not yet implemented')
+		default:
+			throw new Error(`Unsupported shipment direction: "${direction}"`)
+	}
 }
