@@ -72,8 +72,8 @@ export function DataTable<TData>({
 						)
 					})}
 				</TableHeader>
-				<TableBody className="w-full overflow-y-auto">
-					{table.getRowModel().rows.length === 0 ? (
+				{table.getRowModel().rows.length === 0 ? (
+					<TableBody className="w-full overflow-y-auto">
 						<TableRow>
 							<TableCell colSpan={table.getAllColumns().length}>
 								<div className="m-6 rounded border-2 border-dashed border-primary/15 py-4 text-center">
@@ -81,43 +81,43 @@ export function DataTable<TData>({
 								</div>
 							</TableCell>
 						</TableRow>
-					) : (
-						table.getRowModel().rows.map((row) => {
-							return (
-								<Collapsible
-									key={row.id}
-									open={openItem === row.id}
-									onOpenChange={() => setOpenItem((previous) => (previous === row.id ? null : row.id))}
-									asChild
-								>
-									<React.Fragment>
-										<TableRow>
-											{row.getVisibleCells().map((cell) => {
-												return (
-													<TableCell
-														key={cell.id}
-														className={cn('px-4 py-2 uppercase', cell.column.columnDef.meta?.rowClassName ?? '')}
-													>
-														{flexRender(cell.column.columnDef.cell, cell.getContext())}
-													</TableCell>
-												)
-											})}
-										</TableRow>
-										{renderRowDetails && (
-											<CollapsibleContent asChild>
-												<TableRow>
-													<TableCell colSpan={row.getVisibleCells().length} className="p-0">
-														{renderRowDetails(row)}
-													</TableCell>
-												</TableRow>
-											</CollapsibleContent>
-										)}
-									</React.Fragment>
-								</Collapsible>
-							)
-						})
-					)}
-				</TableBody>
+					</TableBody>
+				) : (
+					table.getRowModel().rows.map((row) => {
+						return (
+							<Collapsible
+								key={row.id}
+								open={openItem === row.id}
+								onOpenChange={() => setOpenItem((previous) => (previous === row.id ? null : row.id))}
+								asChild
+							>
+								<TableBody className="w-full overflow-y-auto">
+									<TableRow>
+										{row.getVisibleCells().map((cell) => {
+											return (
+												<TableCell
+													key={cell.id}
+													className={cn('px-4 py-2 uppercase', cell.column.columnDef.meta?.rowClassName ?? '')}
+												>
+													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+												</TableCell>
+											)
+										})}
+									</TableRow>
+									{renderRowDetails && (
+										<CollapsibleContent asChild>
+											<TableRow>
+												<TableCell colSpan={row.getVisibleCells().length} className="p-0">
+													{renderRowDetails(row)}
+												</TableCell>
+											</TableRow>
+										</CollapsibleContent>
+									)}
+								</TableBody>
+							</Collapsible>
+						)
+					})
+				)}
 			</Table>
 		</div>
 	)
