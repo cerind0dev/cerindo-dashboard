@@ -3,7 +3,9 @@ import type { NextConfig } from 'next'
 import './src/env.ts'
 
 const nextConfig: NextConfig = {
-	/* config options here */
+	experimental: {
+		agentUpgrade: 'latest',
+	},
 	images: {
 		remotePatterns: [
 			{
