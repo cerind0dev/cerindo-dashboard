@@ -3,20 +3,15 @@ import { toast } from 'sonner'
 
 import { createClient as createBrowserClient } from '@/lib/supabase/client'
 
+import { createAlkesAction, deleteAlkesAction, updateAlkesAction } from './alkes-actions'
+import { alkesCache } from './alkes-cache'
 import {
 	getAlkesByIdQuery,
 	getAlkesItemsByAlkesIdQuery,
 	getAlkesItemsByTypeQuery,
 	getAlkesQuery,
 } from './alkes-fetchers'
-import {
-	createAlkesItemMutation,
-	createAlkesMutation,
-	deleteAlkesItemMutation,
-	deleteAlkesMutation,
-	updateAlkesItemMutation,
-	updateAlkesMutation,
-} from './alkes-mutations'
+import { createAlkesItemMutation, deleteAlkesItemMutation, updateAlkesItemMutation } from './alkes-mutations'
 
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -28,7 +23,7 @@ import type {
 } from './alkes.types'
 
 const queryKeys = {
-	all: () => ['alkes'] as const,
+	all: () => alkesCache.key,
 	getAlkesById: (id: Alkes['id']) => [...queryKeys.all(), 'by-id', { id }],
 	getAlkesItemsByType: (type: AlkesItem['type']) => [...queryKeys.all(), 'items-by-type', { type }],
 	getAlkesItemsByAlkesId: (alkesId: Alkes['id']) => [...queryKeys.all(), 'items-by-alkes-id', { alkesId }],
@@ -45,6 +40,7 @@ export function getAlkesQueryOptions(client: SupabaseClient<Database>) {
 
 			return response.data
 		},
+		staleTime: alkesCache.staleTime,
 	})
 }
 
@@ -101,16 +97,10 @@ export function getAlkesItemsByTypeQueryOptions(type: AlkesItem['type']) {
 }
 
 export function useCreateAlkesMutation() {
-	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: async (alkes: Database['public']['Tables']['alkes']['Insert']) => {
-			const response = await createAlkesMutation(supabase, alkes)
-			if (response.error) {
-				throw response.error
-			}
-		},
+		mutationFn: (alkes: Database['public']['Tables']['alkes']['Insert']) => createAlkesAction(alkes),
 		onSuccess: () => {
 			toast.success('Alkes berhasil ditambahkan', { position: 'top-right' })
 		},
@@ -153,16 +143,10 @@ export function useCreateAlkesItemMutation() {
 }
 
 export function useUpdateAlkesMutation(id: Alkes['id']) {
-	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: async (updated: Database['public']['Tables']['alkes']['Update']) => {
-			const response = await updateAlkesMutation(supabase, id, updated)
-			if (response.error) {
-				throw response.error
-			}
-		},
+		mutationFn: (updated: Database['public']['Tables']['alkes']['Update']) => updateAlkesAction(id, updated),
 		onSuccess: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: queryKeys.getAlkesById(id) }),
@@ -209,16 +193,10 @@ export function useUpdateAlkesItemMutation(id: AlkesItem['id']) {
 }
 
 export function useDeleteAlkesMutation(id: Alkes['id']) {
-	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: async () => {
-			const response = await deleteAlkesMutation(supabase, id)
-			if (response.error) {
-				throw response.error
-			}
-		},
+		mutationFn: () => deleteAlkesAction(id),
 		onMutate: async () => {
 			await queryClient.cancelQueries({ queryKey: queryKeys.all() })
 

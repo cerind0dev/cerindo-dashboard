@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { connection } from 'next/server'
 
 import { createClient } from '@/lib/supabase/server'
 
@@ -8,7 +9,12 @@ import Icons from '@/components/icons'
 
 import LoginForm from '../_components/forms/login-form'
 
+// instant = false: verify the session before showing the login form or redirecting.
+export const instant = false
+
 export default async function LoginPage() {
+	await connection()
+
 	const supabase = await createClient()
 	const response = await supabase.auth.getClaims()
 

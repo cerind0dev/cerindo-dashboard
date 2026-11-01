@@ -11,7 +11,7 @@ const PUBLIC_ROUTES = ['/', '/tracking', '/login', '/register', '/forgot-passwor
 
 export async function updateSession(request: NextRequest) {
 	const path = request.nextUrl.pathname
-	const isProtectedRoute = PROTECTED_ROUTES.includes(path)
+	const isProtectedRoute = PROTECTED_ROUTES.some((route) => path === route || path.startsWith(`${route}/`))
 	const isPublicRoute = PUBLIC_ROUTES.includes(path) || request.nextUrl.pathname.startsWith('/api/public')
 
 	let supabaseResponse = NextResponse.next({
