@@ -1,5 +1,6 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
+import { connection } from 'next/server'
 
 import { createClient } from '@/lib/supabase/server'
 
@@ -8,11 +9,16 @@ import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import UserAccountNavigation from '@/components/user-account-navigation'
 
+// instant = false: verify authentication before rendering any protected dashboard content.
+export const instant = false
+
 type DashboardRootLayoutProps = {
 	children: React.ReactNode
 }
 
 export default async function DashboardRootLayout({ children }: DashboardRootLayoutProps) {
+	await connection()
+
 	const supabase = await createClient()
 	const response = await supabase.auth.getClaims()
 
