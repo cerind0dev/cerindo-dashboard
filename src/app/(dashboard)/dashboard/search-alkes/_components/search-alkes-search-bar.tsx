@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -23,7 +23,6 @@ import type { AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alke
 export default function SearchAlkesSearchBar() {
 	const [query, setQuery] = useState<string>('')
 	const debouncedQuery = useDebounce<string>(query, 200)
-	const currentDate = useMemo(() => new Date(), [])
 
 	const alkes = useDistinctAlkes()
 	const { addAlkesItem } = useAlkesActions()
@@ -112,9 +111,9 @@ export default function SearchAlkesSearchBar() {
 												</p>
 												<p className="mt-3 text-sm text-slate-700">
 													<span className="font-semibold text-primary">Expiry date:</span>{' '}
-													{new Date(alkes.alkes.expiry_date ? alkes.alkes.expiry_date : currentDate).toLocaleDateString(
-														'id-ID',
-													)}
+													{alkes.alkes.expiry_date
+														? new Date(alkes.alkes.expiry_date).toLocaleDateString('id-ID')
+														: 'Tidak tersedia'}
 												</p>
 											</li>
 										)

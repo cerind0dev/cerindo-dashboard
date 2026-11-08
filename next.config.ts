@@ -3,6 +3,9 @@ import type { NextConfig } from 'next'
 import './src/env.ts'
 
 const nextConfig: NextConfig = {
+	agentRules: true,
+	cacheComponents: true,
+	partialPrefetching: true,
 	experimental: {
 		agentUpgrade: 'latest',
 	},
@@ -21,4 +24,3 @@ const nextConfig: NextConfig = {
 }
 
 export default nextConfig
-

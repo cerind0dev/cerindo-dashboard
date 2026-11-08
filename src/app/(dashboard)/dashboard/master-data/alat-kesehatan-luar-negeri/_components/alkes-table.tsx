@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import {
@@ -20,13 +20,12 @@ import DataTableColumnHeader from '@/components/data-table/data-table-column-hea
 import DataTableToolbar from '@/components/data-table/data-table-toolbar'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
-import { SheetTrigger } from '@/components/ui/sheet'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Sheet, SheetTrigger } from '@/components/ui/sheet'
 
 import AlkesItemsTable from './alkes-items-table'
 import CreateAlkesForm from './forms/create-alkes-form'
+import UpdateAlkesSheet from './update-alkes-sheet'
 
 import type { AlkesWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { Row } from '@tanstack/react-table'
@@ -43,8 +42,8 @@ export default function AlkesTable() {
 	const supabase = createClient()
 	const queryClient = useQueryClient()
 
-	const { data, isPending, error } = useQuery(getAlkesQueryOptions(supabase)) // get all alkes
-	const [, setAlkesIdQueryString] = useAlkesIdQueryString()
+	const { data } = useSuspenseQuery(getAlkesQueryOptions(supabase)) // get all alkes
+	const [alkesIdQueryString, setAlkesIdQueryString] = useAlkesIdQueryString()
 
 	const columnHelper = createColumnHelper<AlkesWithCountriesAndHscode[number]>()
 	const columns = useMemo(
@@ -188,33 +187,19 @@ export default function AlkesTable() {
 		autoResetAll: false,
 	})
 
-	return isPending ? (
-		<div className="flex max-w-full flex-auto flex-col overflow-auto">
-			<Card className="rounded-none border-0 shadow-none">
-				<CardContent className="flex w-full flex-col gap-8">
-					{Array.from({ length: 8 }).map((_, index) => (
-						<div className="flex gap-4" key={index}>
-							<Skeleton className="h-8 flex-2" />
-							<Skeleton className="hidden h-8 flex-6 lg:block" />
-							<Skeleton className="hidden h-8 flex-1 lg:block" />
-							<Skeleton className="h-8 flex-1" />
-							<Skeleton className="h-8 flex-1" />
-							<Skeleton className="h-8 flex-1" />
-						</div>
-					))}
-				</CardContent>
-			</Card>
-		</div>
-	) : (
-		<DataTable
-			table={table}
-			stickyHeader={true}
-			emptyDataText="Tidak ada data alkes"
-			renderRowDetails={(row) => <AlkesTableRowDetail row={row} />}
-		>
-			<DataTableToolbar table={table} className="border-b px-6 py-3">
-				<CreateAlkesForm />
-			</DataTableToolbar>
-		</DataTable>
+	return (
+		<Sheet open={!!alkesIdQueryString} onOpenChange={(open) => !open && setAlkesIdQueryString(null)}>
+			<UpdateAlkesSheet />
+			<DataTable
+				table={table}
+				stickyHeader={true}
+				emptyDataText="Tidak ada data alkes"
+				renderRowDetails={(row) => <AlkesTableRowDetail row={row} />}
+			>
+				<DataTableToolbar table={table} className="border-y px-6 py-3">
+					<CreateAlkesForm />
+				</DataTableToolbar>
+			</DataTable>
+		</Sheet>
 	)
 }

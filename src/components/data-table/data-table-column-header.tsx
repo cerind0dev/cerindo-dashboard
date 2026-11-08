@@ -4,14 +4,6 @@ import React from 'react'
 
 import { cn } from '@/lib/utils/utils'
 
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-
 import type { Column } from '@tanstack/react-table'
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.ComponentProps<'span'> {

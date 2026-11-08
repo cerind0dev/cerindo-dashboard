@@ -77,7 +77,7 @@ export default function CreateAlkesItemForm({ alkesId, className, ...props }: Cr
 				</DialogTrigger>
 				<DialogContent className="md:max-w-lg">
 					<DialogHeader>
-						<DialogTitle>Tambah alkes</DialogTitle>
+						<DialogTitle>Tambah item alkes</DialogTitle>
 						<DialogDescription>Anda akan menambahkan data item alkes baru ke dalam database</DialogDescription>
 					</DialogHeader>
 					<div className="-mx-4 no-scrollbar max-h-[60vh] overflow-y-auto px-4">

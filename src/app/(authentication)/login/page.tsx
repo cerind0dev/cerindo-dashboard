@@ -1,21 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-
-import { createClient } from '@/lib/supabase/server'
 
 import Icons from '@/components/icons'
 
 import LoginForm from '../_components/forms/login-form'
 
 export default async function LoginPage() {
-	const supabase = await createClient()
-	const response = await supabase.auth.getClaims()
-
-	if (response.error === null && response.data?.claims) {
-		redirect('/dashboard')
-	}
-
 	return (
 		<section className="container mx-auto flex h-full max-w-lg flex-col items-start justify-center rounded-lg px-0">
 			<div className="inline-flex flex-col items-start">

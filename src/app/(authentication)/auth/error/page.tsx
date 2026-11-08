@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -34,9 +34,9 @@ export default function ErrorPage({ searchParams }: ErrorPageProps) {
 							<CardTitle className="text-2xl">Sorry, something went wrong.</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<Suspense>
+							<React.Suspense>
 								<ErrorContent searchParams={searchParams} />
-							</Suspense>
+							</React.Suspense>
 						</CardContent>
 					</Card>
 				</div>

@@ -6,9 +6,12 @@ interface VerifyEmailPageProps {
 	searchParams: Promise<{ [key: string]: string }>
 }
 
-export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageProps) {
+async function RequestResendEmailButton({ searchParams }: VerifyEmailPageProps) {
 	const email = (await searchParams).email
+	return <ResendEmailButton email={email} />
+}
 
+export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageProps) {
 	return (
 		<section className="container mx-auto flex h-full max-w-lg flex-col items-start justify-center rounded-lg px-0">
 			<div className="w-full">
@@ -19,7 +22,9 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageP
 						registration
 					</p>
 				</div>
-				<ResendEmailButton email={email} />
+				<React.Suspense fallback={<div className="h-10" role="status" aria-label="Loading email confirmation" />}>
+					<RequestResendEmailButton searchParams={searchParams} />
+				</React.Suspense>
 			</div>
 		</section>
 	)

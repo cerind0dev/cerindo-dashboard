@@ -1,7 +1,4 @@
 import React from 'react'
-import { redirect } from 'next/navigation'
-
-import { createClient } from '@/lib/supabase/server'
 
 import AppSidebar from '@/components/layouts/app-sidebar'
 import { Separator } from '@/components/ui/separator'
@@ -13,13 +10,6 @@ type DashboardRootLayoutProps = {
 }
 
 export default async function DashboardRootLayout({ children }: DashboardRootLayoutProps) {
-	const supabase = await createClient()
-	const response = await supabase.auth.getClaims()
-
-	if (response.error || !response.data?.claims) {
-		redirect('/login')
-	}
-
 	return (
 		<SidebarProvider className="relative overflow-hidden">
 			<AppSidebar />

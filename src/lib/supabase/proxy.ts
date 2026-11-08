@@ -7,12 +7,14 @@ import type { Database } from '@/types/database.types'
 import type { NextRequest } from 'next/server'
 
 const PROTECTED_ROUTES = ['/dashboard']
-const PUBLIC_ROUTES = ['/', '/tracking', '/login', '/register', '/forgot-password']
+const PUBLIC_ROUTES = ['/tracking', '/login', '/register', '/forgot-password']
 
 export async function updateSession(request: NextRequest) {
 	const path = request.nextUrl.pathname
-	const isProtectedRoute = PROTECTED_ROUTES.includes(path)
-	const isPublicRoute = PUBLIC_ROUTES.includes(path) || request.nextUrl.pathname.startsWith('/api/public')
+	const isProtectedRoute = PROTECTED_ROUTES.some((route) => path === route || path.startsWith(`${route}/`))
+	const isPublicRoute = PUBLIC_ROUTES.some(
+		(route) => path === route || request.nextUrl.pathname.startsWith('/api/public'),
+	)
 
 	let supabaseResponse = NextResponse.next({
 		request,

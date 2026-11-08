@@ -3,20 +3,16 @@ import { toast } from 'sonner'
 
 import { createClient as createBrowserClient } from '@/lib/supabase/client'
 
+import { createAlkesAction, deleteAlkesAction, updateAlkesAction } from './alkes-actions'
+import { alkesCacheKey } from './alkes-cache-key'
 import {
 	getAlkesByIdQuery,
 	getAlkesItemsByAlkesIdQuery,
 	getAlkesItemsByTypeQuery,
 	getAlkesQuery,
 } from './alkes-fetchers'
-import {
-	createAlkesItemMutation,
-	createAlkesMutation,
-	deleteAlkesItemMutation,
-	deleteAlkesMutation,
-	updateAlkesItemMutation,
-	updateAlkesMutation,
-} from './alkes-mutations'
+import { createAlkesItemMutation, deleteAlkesItemMutation, updateAlkesItemMutation } from './alkes-mutations'
+import { alkesIdSchema, createAlkesPayloadSchema, udpateAlkesPayloadSchema } from './alkes-validation'
 
 import type { Database } from '@/types/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -28,7 +24,7 @@ import type {
 } from './alkes.types'
 
 const queryKeys = {
-	all: () => ['alkes'] as const,
+	all: () => alkesCacheKey.key,
 	getAlkesById: (id: Alkes['id']) => [...queryKeys.all(), 'by-id', { id }],
 	getAlkesItemsByType: (type: AlkesItem['type']) => [...queryKeys.all(), 'items-by-type', { type }],
 	getAlkesItemsByAlkesId: (alkesId: Alkes['id']) => [...queryKeys.all(), 'items-by-alkes-id', { alkesId }],
@@ -45,6 +41,7 @@ export function getAlkesQueryOptions(client: SupabaseClient<Database>) {
 
 			return response.data
 		},
+		staleTime: alkesCacheKey.staleTime, // prevents an immediate client refetch by keeping the hydrated data fresh
 	})
 }
 
@@ -62,7 +59,7 @@ export function getAlkesByIdQueryOptions(id: Alkes['id']) {
 			return response.data
 		},
 		enabled: !!id,
-		placeholderData: keepPreviousData,
+		staleTime: 0, // so everytime it triggers a fresh request rather than using a cached data (if any)
 	})
 }
 
@@ -80,6 +77,7 @@ export function getAlkesItemsByAlkesIdQueryOptions(alkesId: Alkes['id']) {
 			return response.data
 		},
 		enabled: alkesId.length > 0,
+		refetchOnMount: true,
 	})
 }
 
@@ -101,16 +99,11 @@ export function getAlkesItemsByTypeQueryOptions(type: AlkesItem['type']) {
 }
 
 export function useCreateAlkesMutation() {
-	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: async (alkes: Database['public']['Tables']['alkes']['Insert']) => {
-			const response = await createAlkesMutation(supabase, alkes)
-			if (response.error) {
-				throw response.error
-			}
-		},
+		mutationFn: async (alkes: Database['public']['Tables']['alkes']['Insert']) =>
+			createAlkesAction(createAlkesPayloadSchema.parse(alkes)),
 		onSuccess: () => {
 			toast.success('Alkes berhasil ditambahkan', { position: 'top-right' })
 		},
@@ -153,24 +146,20 @@ export function useCreateAlkesItemMutation() {
 }
 
 export function useUpdateAlkesMutation(id: Alkes['id']) {
-	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: async (updated: Database['public']['Tables']['alkes']['Update']) => {
-			const response = await updateAlkesMutation(supabase, id, updated)
-			if (response.error) {
-				throw response.error
-			}
-		},
+		mutationFn: async (updated: Database['public']['Tables']['alkes']['Update']) =>
+			updateAlkesAction(alkesIdSchema.parse(id), udpateAlkesPayloadSchema.parse(updated)),
 		onSuccess: async () => {
-			await Promise.all([
-				queryClient.invalidateQueries({ queryKey: queryKeys.getAlkesById(id) }),
-				queryClient.invalidateQueries({ queryKey: queryKeys.all(), exact: false }),
-				queryClient.invalidateQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(id) }),
-			])
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.all(),
+				exact: false,
+			})
 
-			toast.success(`${id.split('_').join(' ')} berhasil diperbarui`, { position: 'top-right' })
+			toast.success(`${id.split('_').join(' ')} berhasil diperbarui`, {
+				position: 'top-right',
+			})
 		},
 		onError: (error) => {
 			const message = error.message || 'An unexpected error occurred'
@@ -209,16 +198,10 @@ export function useUpdateAlkesItemMutation(id: AlkesItem['id']) {
 }
 
 export function useDeleteAlkesMutation(id: Alkes['id']) {
-	const supabase = createBrowserClient()
 	const queryClient = useQueryClient()
 
 	return useMutation({
-		mutationFn: async () => {
-			const response = await deleteAlkesMutation(supabase, id)
-			if (response.error) {
-				throw response.error
-			}
-		},
+		mutationFn: async () => deleteAlkesAction(alkesIdSchema.parse(id)),
 		onMutate: async () => {
 			await queryClient.cancelQueries({ queryKey: queryKeys.all() })
 
@@ -232,6 +215,9 @@ export function useDeleteAlkesMutation(id: Alkes['id']) {
 			return { previous }
 		},
 		onSuccess: () => {
+			queryClient.removeQueries({ queryKey: queryKeys.getAlkesById(id) })
+			queryClient.removeQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(id) })
+
 			toast.success(`${id.split('_').join(' ')} berhasil dihapus`, { position: 'top-right' })
 		},
 		onError: (error, _, context) => {
@@ -243,9 +229,10 @@ export function useDeleteAlkesMutation(id: Alkes['id']) {
 			toast.error(`Gagal menghapus ${id.split('_').join(' ')}: ${message}`, { position: 'top-right' })
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: queryKeys.all(), exact: false })
-			queryClient.removeQueries({ queryKey: queryKeys.getAlkesById(id) })
-			queryClient.removeQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(id) })
+			queryClient.invalidateQueries({
+				queryKey: queryKeys.all(),
+				exact: false,
+			})
 		},
 	})
 }
@@ -274,6 +261,9 @@ export function useDeleteAlkesItemMutation(id: AlkesItem['id']) {
 			return { previous }
 		},
 		onSuccess: () => {
+			queryClient.removeQueries({ queryKey: queryKeys.getAlkesById(id) })
+			queryClient.removeQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(id) })
+
 			toast.success(`Item ${id.split('_')[0]} berhasil dihapus`, { position: 'top-right' })
 		},
 		onError: (error, _, context) => {
@@ -285,9 +275,10 @@ export function useDeleteAlkesItemMutation(id: AlkesItem['id']) {
 			toast.error(`Gagal menghapus item ${id.split('_')[0]}: ${message}`, { position: 'top-right' })
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: queryKeys.all(), exact: false })
-			queryClient.removeQueries({ queryKey: queryKeys.getAlkesById(id) })
-			queryClient.removeQueries({ queryKey: queryKeys.getAlkesItemsByAlkesId(id) })
+			queryClient.invalidateQueries({
+				queryKey: queryKeys.all(),
+				exact: false,
+			})
 		},
 	})
 }
