@@ -17,8 +17,10 @@ export default async function MasterDataAlkesPage() {
 		<div className="flex h-full flex-auto flex-col overflow-y-auto bg-white text-secondary-foreground">
 			<div className="flex flex-col gap-6 px-4 py-8">
 				<PageHeader as={'div'} className="max-w-full px-5">
-					<PageHeaderHeading className={`${rubik.className}`}>Master Data Alkes</PageHeaderHeading>
-					<PageHeaderDescription>
+					<PageHeaderHeading size="md" className={`${rubik.className}`}>
+						Master Data Alkes
+					</PageHeaderHeading>
+					<PageHeaderDescription size="sm">
 						Tempat untuk operasi data alkes: tambah alkes baru, update alkes kadaluarsa, hapus alkes tidak terpakai, dan
 						lainnya
 					</PageHeaderDescription>

@@ -31,6 +31,7 @@ const headingVariants = cva('font-bold leading-tight tracking-tighter lg:leading
 		size: {
 			default: 'text-3xl md:text-5xl',
 			sm: 'text-xl md:text-3xl',
+			md: 'text-2xl md:text-4xl',
 			lg: 'text-3xl sm:text-5xl md:text-6xl lg:text-7xl',
 		},
 	},

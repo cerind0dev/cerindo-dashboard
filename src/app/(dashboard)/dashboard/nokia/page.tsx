@@ -13,8 +13,10 @@ export default async function NokiaPage() {
 		<div className="flex h-full flex-auto flex-col overflow-y-auto bg-white text-secondary-foreground">
 			<div className="flex flex-col gap-6 px-4 py-8">
 				<PageHeader as={'div'} className="max-w-full px-5">
-					<PageHeaderHeading className={`${rubik.className}`}>Nokia</PageHeaderHeading>
-					<PageHeaderDescription>Proses shipment impor dan ekspor nokia dengan cepat</PageHeaderDescription>
+					<PageHeaderHeading size="md" className={`${rubik.className}`}>
+						Nokia
+					</PageHeaderHeading>
+					<PageHeaderDescription size="sm">Proses shipment impor dan ekspor nokia dengan cepat</PageHeaderDescription>
 				</PageHeader>
 			</div>
 			<Tabs defaultValue="import" className="max-w-full gap-0">
