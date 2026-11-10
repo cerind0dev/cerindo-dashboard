@@ -11,17 +11,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import DataTablePagination from './data-table-pagination'
 
-import type { Row, Table as TanstackTable } from '@tanstack/react-table'
+import type { Row, RowData, Table as TanstackTable } from '@tanstack/react-table'
+import type { DataTableFeatures } from './data-table-features'
 
-interface DataTableProps<TData> extends React.ComponentProps<'div'> {
+interface DataTableProps<TData extends RowData> extends React.ComponentProps<'div'> {
 	className?: string
-	table: TanstackTable<TData>
+	table: TanstackTable<DataTableFeatures, TData>
 	stickyHeader: boolean
 	emptyDataText: string
-	renderRowDetails?: (row: Row<TData>) => React.ReactNode
+	renderRowDetails?: (row: Row<DataTableFeatures, TData>) => React.ReactNode
 }
 
-export function DataTable<TData>({
+export function DataTable<TData extends RowData>({
 	table,
 	className,
 	children,
@@ -37,7 +38,7 @@ export function DataTable<TData>({
 			{children}
 			<Table>
 				<TableHeader className={cn(stickyHeader && 'sticky top-0 z-10', 'shadow-sm [&_tr]:border-b-0')}>
-					{table.options.getPaginationRowModel !== undefined && (
+					{table.getPaginatedRowModel !== undefined && (
 						<TableRow className="relative border-b-0">
 							<TableCell
 								scope="col"

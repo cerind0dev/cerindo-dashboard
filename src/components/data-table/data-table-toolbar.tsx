@@ -8,19 +8,20 @@ import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, RowData, Table } from '@tanstack/react-table'
+import type { DataTableFeatures } from './data-table-features'
 
-interface DataTableToolbarProps<TData> extends React.ComponentProps<'div'> {
-	table: Table<TData>
+interface DataTableToolbarProps<TData extends RowData> extends React.ComponentProps<'div'> {
+	table: Table<DataTableFeatures, TData>
 }
 
-export default function DataTableToolbar<TData>({
+export default function DataTableToolbar<TData extends RowData>({
 	table,
 	children,
 	className,
 	...props
 }: DataTableToolbarProps<TData>) {
-	const isFiltered = table.getState().columnFilters.length > 0
+	const isFiltered = table.store.state.columnFilters.length > 0
 
 	const columns = useMemo(() => {
 		return table.getAllColumns().filter((column) => column.getCanFilter())
@@ -53,11 +54,11 @@ export default function DataTableToolbar<TData>({
 	)
 }
 
-interface DataTableToolbarFilterProps<TData> {
-	column: Column<TData>
+interface DataTableToolbarFilterProps<TData extends RowData> {
+	column: Column<DataTableFeatures, TData>
 }
 
-function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<TData>) {
+function DataTableToolbarFilter<TData extends RowData>({ column }: DataTableToolbarFilterProps<TData>) {
 	const columnMeta = column.columnDef.meta
 
 	const onFilterRender = useCallback(() => {

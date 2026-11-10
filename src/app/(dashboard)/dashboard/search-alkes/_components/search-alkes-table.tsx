@@ -14,11 +14,12 @@ import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { CollapsibleTrigger } from '@/components/ui/collapsible'
 
+import type { DataTableFeatures } from '@/components/data-table/data-table-features'
 import type { AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { Row } from '@tanstack/react-table'
 
 interface SearchAlkesRowDetailProps {
-	row: Row<AlkesItemsByTypeWithCountriesAndHscode[number]>
+	row: Row<DataTableFeatures, AlkesItemsByTypeWithCountriesAndHscode[number]>
 }
 
 function SearchAlkesRowDetail({ row }: SearchAlkesRowDetailProps) {
@@ -154,81 +155,82 @@ function SearchAlkesRowDetail({ row }: SearchAlkesRowDetailProps) {
 export default function SearchAlkesTable() {
 	const alkesItems = useAlkesItems()
 
-	const columnHelper = createColumnHelper<AlkesItemsByTypeWithCountriesAndHscode[number]>()
+	const columnHelper = createColumnHelper<DataTableFeatures, AlkesItemsByTypeWithCountriesAndHscode[number]>()
 	const columns = useMemo(
-		() => [
-			columnHelper.accessor('type', {
-				id: 'alkes-item-type',
-				header: () => <DataTableColumnHeader title="Tipe" />,
-				cell: (info) => {
-					return <span>{info.getValue()}</span>
-				},
-				meta: {
-					headerClassName: 'hidden md:table-cell pr-0',
-					rowClassName: 'hidden md:table-cell pr-0',
-				},
-			}),
-			columnHelper.accessor('name', {
-				id: 'alkes-item-name',
-				header: () => <DataTableColumnHeader title="Deskripsi di alkes" />,
-				cell: (info) => {
-					return <span>{info.getValue()}</span>
-				},
-			}),
-			columnHelper.accessor((row) => `${row.alkes.countries.name} / ${row.alkes.countries.code}`, {
-				id: 'alkes-item-country',
-				header: () => <DataTableColumnHeader title="Negara" />,
-				cell: (info) => {
-					return <span>{info.getValue()}</span>
-				},
-				meta: {
-					headerClassName: 'hidden lg:table-cell',
-					rowClassName: 'hidden lg:table-cell',
-				},
-			}),
-			columnHelper.accessor('alkes.expiry_date', {
-				id: 'alkes-item-status',
-				header: () => <DataTableColumnHeader title="Status" />,
-				cell: (info) => (
-					<span
-						className={cn(
-							'inline-flex flex-row items-center gap-x-1 rounded-full px-2 py-0.5',
-							new Date(info.getValue()) < new Date()
-								? 'bg-destructive/10 text-destructive/60'
-								: 'bg-green-100 text-green-600',
-						)}
-					>
-						{new Date(info.getValue()) < new Date() ? (
-							<React.Fragment>
-								<Icons.circleX strokeWidth={3} className="size-4" />
-								<span>Kadaluarsa</span>
-							</React.Fragment>
-						) : (
-							<React.Fragment>
-								<Icons.circleCheckBig strokeWidth={3} className="size-4" />
-								<span>Aktif</span>
-							</React.Fragment>
-						)}
-					</span>
-				),
-			}),
-			columnHelper.display({
-				id: 'alkes-item-details',
-				header: () => <DataTableColumnHeader title="Details" />,
-				cell: () => (
-					<CollapsibleTrigger asChild>
-						<Button variant="outline" size="icon" className="rounded-full">
-							<Icons.chevronDown className="size-4 text-primary" />
-							<span className="sr-only">Open row details</span>
-						</Button>
-					</CollapsibleTrigger>
-				),
-				meta: {
-					headerClassName: 'pl-0',
-					rowClassName: 'pl-0',
-				},
-			}),
-		],
+		() =>
+			columnHelper.columns([
+				columnHelper.accessor('type', {
+					id: 'alkes-item-type',
+					header: () => <DataTableColumnHeader title="Tipe" />,
+					cell: (info) => {
+						return <span>{info.getValue()}</span>
+					},
+					meta: {
+						headerClassName: 'hidden md:table-cell pr-0',
+						rowClassName: 'hidden md:table-cell pr-0',
+					},
+				}),
+				columnHelper.accessor('name', {
+					id: 'alkes-item-name',
+					header: () => <DataTableColumnHeader title="Deskripsi di alkes" />,
+					cell: (info) => {
+						return <span>{info.getValue()}</span>
+					},
+				}),
+				columnHelper.accessor((row) => `${row.alkes.countries.name} / ${row.alkes.countries.code}`, {
+					id: 'alkes-item-country',
+					header: () => <DataTableColumnHeader title="Negara" />,
+					cell: (info) => {
+						return <span>{info.getValue()}</span>
+					},
+					meta: {
+						headerClassName: 'hidden lg:table-cell',
+						rowClassName: 'hidden lg:table-cell',
+					},
+				}),
+				columnHelper.accessor('alkes.expiry_date', {
+					id: 'alkes-item-status',
+					header: () => <DataTableColumnHeader title="Status" />,
+					cell: (info) => (
+						<span
+							className={cn(
+								'inline-flex flex-row items-center gap-x-1 rounded-full px-2 py-0.5',
+								new Date(info.getValue()) < new Date()
+									? 'bg-destructive/10 text-destructive/60'
+									: 'bg-green-100 text-green-600',
+							)}
+						>
+							{new Date(info.getValue()) < new Date() ? (
+								<React.Fragment>
+									<Icons.circleX strokeWidth={3} className="size-4" />
+									<span>Kadaluarsa</span>
+								</React.Fragment>
+							) : (
+								<React.Fragment>
+									<Icons.circleCheckBig strokeWidth={3} className="size-4" />
+									<span>Aktif</span>
+								</React.Fragment>
+							)}
+						</span>
+					),
+				}),
+				columnHelper.display({
+					id: 'alkes-item-details',
+					header: () => <DataTableColumnHeader title="Details" />,
+					cell: () => (
+						<CollapsibleTrigger asChild>
+							<Button variant="outline" size="icon" className="rounded-full">
+								<Icons.chevronDown className="size-4 text-primary" />
+								<span className="sr-only">Open row details</span>
+							</Button>
+						</CollapsibleTrigger>
+					),
+					meta: {
+						headerClassName: 'pl-0',
+						rowClassName: 'pl-0',
+					},
+				}),
+			]),
 		[columnHelper],
 	)
 

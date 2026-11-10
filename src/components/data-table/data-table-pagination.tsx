@@ -7,17 +7,22 @@ import { cn } from '@/lib/utils/utils'
 import Icons from '@/components/icons'
 import { Button } from '@/components/ui/button'
 
-import type { Table } from '@tanstack/react-table'
+import type { RowData, Table } from '@tanstack/react-table'
+import type { DataTableFeatures } from './data-table-features'
 
-interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
-	table: Table<TData>
+interface DataTablePaginationProps<TData extends RowData> extends React.ComponentProps<'div'> {
+	table: Table<DataTableFeatures, TData>
 }
 
-export default function DataTablePagination<TData>({ table, className, ...props }: DataTablePaginationProps<TData>) {
+export default function DataTablePagination<TData extends RowData>({
+	table,
+	className,
+	...props
+}: DataTablePaginationProps<TData>) {
 	return (
 		<div className={cn('flex items-center space-x-4', className)} {...props}>
 			<p className="text-sm">
-				Halaman {table.getState().pagination.pageIndex + 1} dari {table.getPageCount()}
+				Halaman {table.store.state.pagination.pageIndex + 1} dari {table.getPageCount()}
 			</p>
 			<div className="flex items-center space-x-2">
 				<Button

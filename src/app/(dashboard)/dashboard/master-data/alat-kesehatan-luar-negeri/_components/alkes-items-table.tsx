@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 
 import { useForm } from '@tanstack/react-form-nextjs'
 import { useQuery } from '@tanstack/react-query'
-import { createColumnHelper } from '@tanstack/react-table'
+import { createColumnHelper, filterFn_equalsString } from '@tanstack/react-table'
 
 import {
 	getAlkesItemsByAlkesIdQueryOptions,
@@ -37,11 +37,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import CreateAlkesItemForm from './forms/create-alkes-item-form'
 
+import type { DataTableFeatures } from '@/components/data-table/data-table-features'
 import type { Alkes, AlkesItemsByTypeWithCountriesAndHscode } from '@/lib/features/alkes/alkes.types'
 import type { Row } from '@tanstack/react-table'
 
 interface AlkesItemsTableRowDetailProps extends React.ComponentProps<'form'> {
-	row: Row<AlkesItemsByTypeWithCountriesAndHscode[number]>
+	row: Row<DataTableFeatures, AlkesItemsByTypeWithCountriesAndHscode[number]>
 }
 
 function AlkesItemsTableRowDetail({ row, className, ...props }: AlkesItemsTableRowDetailProps) {
@@ -372,60 +373,61 @@ interface AlkesItemsTableProps {
 export default function AlkesItemsTable({ alkesId }: AlkesItemsTableProps) {
 	const { data, isPending, error } = useQuery(getAlkesItemsByAlkesIdQueryOptions(alkesId))
 
-	const columnHelper = createColumnHelper<AlkesItemsByTypeWithCountriesAndHscode[number]>()
+	const columnHelper = createColumnHelper<DataTableFeatures, AlkesItemsByTypeWithCountriesAndHscode[number]>()
 	const columns = useMemo(
-		() => [
-			columnHelper.accessor('type', {
-				id: 'alkes-item-type',
-				header: () => <DataTableColumnHeader title="Tipe" />,
-				cell: (info) => {
-					return <span>{info.getValue()}</span>
-				},
-				meta: {
-					label: 'Tipe',
-					placeholder: 'Cari item alkes berdasarkan tipe item alkes...',
-					variant: 'text',
-					headerClassName: 'hidden md:table-cell pr-0',
-					rowClassName: 'hidden md:table-cell pr-0',
-				},
-				enableColumnFilter: true,
-				filterFn: 'equalsString',
-			}),
-			columnHelper.accessor('name', {
-				id: 'alkes-item-name',
-				header: () => <DataTableColumnHeader title="Deskripsi di alkes" />,
-				cell: (info) => {
-					return <span>{info.getValue()}</span>
-				},
-			}),
-			columnHelper.accessor((row) => `${row.alkes.countries.name} / ${row.alkes.countries.code}`, {
-				id: 'alkes-item-country',
-				header: () => <DataTableColumnHeader title="Negara" />,
-				cell: (info) => {
-					return <span>{info.getValue()}</span>
-				},
-				meta: {
-					headerClassName: 'hidden lg:table-cell',
-					rowClassName: 'hidden lg:table-cell',
-				},
-			}),
-			columnHelper.display({
-				id: 'alkes-item-details',
-				header: () => <DataTableColumnHeader title="Details" />,
-				cell: () => (
-					<CollapsibleTrigger asChild>
-						<Button variant="outline" size="icon" className="rounded-full">
-							<Icons.chevronDown className="size-4 text-primary" />
-							<span className="sr-only">Open row details</span>
-						</Button>
-					</CollapsibleTrigger>
-				),
-				meta: {
-					headerClassName: 'pl-0',
-					rowClassName: 'pl-0',
-				},
-			}),
-		],
+		() =>
+			columnHelper.columns([
+				columnHelper.accessor('type', {
+					id: 'alkes-item-type',
+					header: () => <DataTableColumnHeader title="Tipe" />,
+					cell: (info) => {
+						return <span>{info.getValue()}</span>
+					},
+					meta: {
+						label: 'Tipe',
+						placeholder: 'Cari item alkes berdasarkan tipe item alkes...',
+						variant: 'text',
+						headerClassName: 'hidden md:table-cell pr-0',
+						rowClassName: 'hidden md:table-cell pr-0',
+					},
+					enableColumnFilter: true,
+					filterFn: filterFn_equalsString,
+				}),
+				columnHelper.accessor('name', {
+					id: 'alkes-item-name',
+					header: () => <DataTableColumnHeader title="Deskripsi di alkes" />,
+					cell: (info) => {
+						return <span>{info.getValue()}</span>
+					},
+				}),
+				columnHelper.accessor((row) => `${row.alkes.countries.name} / ${row.alkes.countries.code}`, {
+					id: 'alkes-item-country',
+					header: () => <DataTableColumnHeader title="Negara" />,
+					cell: (info) => {
+						return <span>{info.getValue()}</span>
+					},
+					meta: {
+						headerClassName: 'hidden lg:table-cell',
+						rowClassName: 'hidden lg:table-cell',
+					},
+				}),
+				columnHelper.display({
+					id: 'alkes-item-details',
+					header: () => <DataTableColumnHeader title="Details" />,
+					cell: () => (
+						<CollapsibleTrigger asChild>
+							<Button variant="outline" size="icon" className="rounded-full">
+								<Icons.chevronDown className="size-4 text-primary" />
+								<span className="sr-only">Open row details</span>
+							</Button>
+						</CollapsibleTrigger>
+					),
+					meta: {
+						headerClassName: 'pl-0',
+						rowClassName: 'pl-0',
+					},
+				}),
+			]),
 		[columnHelper],
 	)
 

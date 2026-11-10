@@ -4,14 +4,15 @@ import React from 'react'
 
 import { cn } from '@/lib/utils/utils'
 
-import type { Column } from '@tanstack/react-table'
+import type { Column, RowData } from '@tanstack/react-table'
+import type { DataTableFeatures } from './data-table-features'
 
-interface DataTableColumnHeaderProps<TData, TValue> extends React.ComponentProps<'span'> {
-	column?: Column<TData, TValue>
+interface DataTableColumnHeaderProps<TData extends RowData, TValue> extends React.ComponentProps<'span'> {
+	column?: Column<DataTableFeatures, TData, TValue>
 	title: string
 }
 
-export default function DataTableColumnHeader<TData, TValue>({
+export default function DataTableColumnHeader<TData extends RowData, TValue>({
 	column,
 	title,
 	className,

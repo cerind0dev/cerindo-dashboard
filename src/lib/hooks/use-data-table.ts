@@ -2,12 +2,15 @@
 
 import React, { useMemo, useState } from 'react'
 
-import { getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
+import { useTable } from '@tanstack/react-table'
 
-import type { ColumnFiltersState, PaginationState, TableOptions } from '@tanstack/react-table'
+import { dataTableFeatures } from '@/components/data-table/data-table-features'
 
-export default function useDataTable<TData>(
-	props: Omit<TableOptions<TData>, 'state' | 'pageCount' | 'getCoreRowModel'>,
+import type { DataTableFeatures } from '@/components/data-table/data-table-features'
+import type { ColumnFiltersState, PaginationState, RowData, TableOptions } from '@tanstack/react-table'
+
+export default function useDataTable<TData extends RowData>(
+	props: Omit<TableOptions<DataTableFeatures, TData>, 'state' | 'features'>,
 ) {
 	const { columns, ...tableProps } = props
 
@@ -18,18 +21,16 @@ export default function useDataTable<TData>(
 
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-	const table = useReactTable({
+	const table = useTable({
 		...tableProps,
+		features: dataTableFeatures,
 		columns,
-		getCoreRowModel: getCoreRowModel(),
-		onPaginationChange: setPagination,
-		getPaginationRowModel: getPaginationRowModel(),
-		onColumnFiltersChange: setColumnFilters,
-		getFilteredRowModel: getFilteredRowModel(),
 		state: {
 			pagination,
 			columnFilters,
 		},
+		onPaginationChange: setPagination,
+		onColumnFiltersChange: setColumnFilters,
 		meta: {
 			...tableProps.meta,
 		},
