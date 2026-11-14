@@ -15,12 +15,16 @@ const alkesNumberSchema = z
 	.string()
 	.trim()
 	.min(1, { error: 'A valid alkes number is required' })
-	.regex(/^AKL \d+$/, { error: 'Alkes number must follow the format: AKL [numbers] (e.g., AKL 1234567)' })
+	.regex(/^(AKL|PKL)\s\d+$/, {
+		error: 'Alkes number must follow the format: AKL [numbers or any symbols] (e.g., AKL 1234567)',
+	})
 
 export const alkesIdSchema = z
 	.string()
 	.trim()
-	.regex(/^AKL_\d+$/, { error: 'Alkes ID must follow the format: AKL_[numbers]' })
+	.regex(/^(AKL|PKL)_.+$/, {
+		error: 'Alkes ID must start with AKL_ or PKL_ followed by a nonempty value',
+	})
 
 const alkesFields = z.object({
 	brand_name: nullableTextSchema,
