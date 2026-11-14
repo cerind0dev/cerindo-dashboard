@@ -10,14 +10,14 @@ export function absoluteUrl(path: string) {
 export function getErrorMessage(error: unknown): string {
 	let message: string
 
-	if (error instanceof Error) {
-		message = error.message
-	} else if (error instanceof z.ZodError) {
+	if (error instanceof z.ZodError) {
 		const errors = error.issues.map((issue) => {
 			return issue.message
 		})
 
 		message = errors.join('\n')
+	} else if (error instanceof Error) {
+		message = error.message
 	} else if (error && typeof error === 'object' && 'message' in error) {
 		message = String(error.message)
 	} else if (typeof error === 'string') {

@@ -19,6 +19,10 @@ interface ActionButtonProps extends React.ComponentProps<typeof Button> {
 	}
 }
 
+function formatToastMessage(message: string) {
+	return <span className="whitespace-pre-line">{message}</span>
+}
+
 export default function ActionButton({
 	className,
 	action,
@@ -42,7 +46,10 @@ export default function ActionButton({
 			await action()
 			toast.success(message.success, { id: currentToastId, position: 'top-right' })
 		} catch (error: unknown) {
-			toast.error(getErrorMessage(error) || message.error, { id: currentToastId, position: 'top-right' })
+			toast.error(formatToastMessage(getErrorMessage(error) || message.error || 'Something went wrong'), {
+				id: currentToastId,
+				position: 'top-right',
+			})
 		} finally {
 			setIsLoading(false)
 		}

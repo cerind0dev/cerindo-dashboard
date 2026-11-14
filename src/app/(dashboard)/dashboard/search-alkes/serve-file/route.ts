@@ -3,104 +3,162 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import archiver from 'archiver'
 
+import { serveAlkesFileSchema } from '@/lib/features/alkes/alkes-validation'
 import { createClient } from '@/lib/supabase/server'
 import { getErrorMessage } from '@/lib/utils/utils'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-	console.log('started an export')
+	let body: unknown
 
 	try {
-		const body = await request.json()
-		const alkesFiles: { id: string; file_url: string }[] = body.alkesFiles || []
+		body = await request.json()
+	} catch {
+		return NextResponse.json({ message: 'Invalid or empty JSON payload' }, { status: 400 })
+	}
 
-		if (alkesFiles.length === 0) {
-			return NextResponse.json({ message: 'Dokumen kosong' }, { status: 400 })
-		}
+	const result = serveAlkesFileSchema.safeParse(body)
 
-		const missingFiles = alkesFiles.filter((f) => !f.file_url).map((f) => f.id)
+	if (!result.success) {
+		return NextResponse.json({ message: getErrorMessage(result.error) }, { status: 400 })
+	}
 
-		if (missingFiles.length > 0) {
-			return NextResponse.json(
-				{
-					message: `Berkas berikut rusak atau hilang: ${missingFiles.join(', ')}`,
-				},
-				{ status: 400 },
-			)
-		}
+	const { alkesFiles } = result.data
 
+	try {
+		const controller = new AbortController()
 		const supabase = await createClient()
-		const archive = archiver('zip', { zlib: { level: 5 } })
+		const archive = archiver('zip', { zlib: { level: 1 } })
 
-		const webStream = new ReadableStream({
-			async start(controller) {
-				let aborted = false
+		let aborted = false
 
-				// if the user closes the tab, this triggers
-				request.signal.addEventListener('abort', () => {
-					aborted = true
-					archive.abort()
-				})
+		function onRequestAbort() {
+			aborted = true
+			controller.abort()
+			archive.destroy()
+		}
 
-				archive.on('data', (chunk) => controller.enqueue(chunk)) // bridge: Node.js "data" event -> web "enqueue"
-				archive.on('end', () => controller.close()) // bridge: Node.js "end" event -> web "close"
-				archive.on('error', (err) => controller.error(err)) // bridge: Node.js "error" event -> web "error"
+		/**
+		 * appends a file to archive and waits for its zip entry to finish. call sequentially:
+		 * the archive's next `entry` event must belong to this file.
+		 * rejects on archive or source errors, or premature archive closure.
+		 * archive listeners are removed when the wait settles
+		 * each outcome should remove all three archive listeners before settling the promise
+		 * otherwise, unused archive listeners accumulate as we process files?
+		 *
+		 * the source error listener remains until source closure to handle errors during cancellation.
+		 */
+		function appendFileToArchive(source: Readable, filename: string): Promise<void> {
+			return new Promise<void>((resolve, reject) => {
+				function cleanupArchive() {
+					archive.off('entry', onEntry)
+					archive.off('error', onError)
+					archive.off('close', onClose)
+				}
 
-				for (const file of alkesFiles) {
-					if (aborted) {
-						break
+				function cleanupSource() {
+					source.off('error', onError)
+				}
+
+				function onEntry() {
+					cleanupArchive()
+					resolve()
+				}
+
+				function onError(error: Error) {
+					cleanupArchive()
+					reject(error)
+				}
+
+				function onClose() {
+					cleanupArchive()
+					reject(new Error('Archive closed before the file entry completed'))
+				}
+
+				archive.once('entry', onEntry)
+				archive.once('error', onError)
+				archive.once('close', onClose)
+
+				source.on('error', onError)
+				source.once('close', cleanupSource)
+
+				try {
+					archive.append(source, { name: filename })
+				} catch (error: unknown) {
+					cleanupArchive()
+					reject(error)
+				}
+			})
+		}
+
+		async function produceArchive() {
+			for (const file of alkesFiles) {
+				if (aborted) {
+					return
+				}
+
+				try {
+					const response = await supabase.storage.from('cerindo/alkes').createSignedUrl(file.file_url, 60)
+
+					if (response.error !== null || !response.data) {
+						throw new Error(response.error?.message || 'Berkas tidak ditemukan')
 					}
 
-					if (!file.file_url) {
-						console.warn(`URL missing for ${file.id}`)
-						continue
+					const fileResponse = await fetch(response.data.signedUrl, { signal: controller.signal })
+					if (!fileResponse.ok || !fileResponse.body) {
+						throw new Error('Gagal mengunduh berkas')
 					}
 
-					try {
-						// const response = await supabase.storage.from('cerindo/alkes').download(file.file_url) // will download the files into memory
-						const response = await supabase.storage.from('cerindo/alkes').createSignedUrl(file.file_url, 60)
+					const contentType = fileResponse.headers.get('content-type') || 'application/pdf'
+					const mimeType = contentType.split(';')[0].trim().toLowerCase()
+					const extension = mimeType.split('/')[1] || 'pdf'
 
-						if (response.error !== null || !response.data) {
-							throw new Error(response.error?.message || 'Berkas tidak ditemukan')
-						}
+					const nodeReadable = Readable.fromWeb(fileResponse.body as Parameters<typeof Readable.fromWeb>[0]) // ai help
 
-						const fileResponse = await fetch(response.data.signedUrl)
-						if (!fileResponse.ok || !fileResponse.body) {
-							throw new Error('Gagal mengunduh berkas')
-						}
-
-						const contentType = fileResponse.headers.get('content-type') || 'application/pdf'
-						const extension = contentType.split('/')[1] || 'pdf'
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						const nodeReadable = Readable.fromWeb(fileResponse.body as any)
-						const entryPromise = new Promise((resolve, reject) => {
-							archive.once('entry', resolve)
-						})
-
-						archive.append(nodeReadable, { name: `${file.id}.${extension}` })
-						await entryPromise
-					} catch (error: unknown) {
-						controller.error(
-							new Error(`Gagal memproses ${file.id}: ${getErrorMessage(error) || 'Berkas berikut rusak atau hilang'}`),
-						)
-
-						archive.abort()
+					if (aborted || archive.destroyed) {
+						nodeReadable.destroy()
 						return
 					}
+
+					await appendFileToArchive(nodeReadable, `${file.id}.${extension}`)
+				} catch (error: unknown) {
+					throw new Error(`Gagal memproses ${file.id}: ${getErrorMessage(error) || 'Berkas berikut rusak atau hilang'}`)
 				}
-				await archive.finalize()
-			},
-			cancel() {
-				archive.abort()
+			}
+
+			await archive.finalize()
+		}
+
+		const webStream = Readable.toWeb(archive, {
+			strategy: {
+				highWaterMark: 64 * 1024,
+				size: (chunk) => chunk.byteLength,
 			},
 		})
 
+		request.signal.addEventListener('abort', onRequestAbort, { once: true })
+
+		archive.once('close', () => {
+			aborted = true
+			controller.abort()
+			request.signal.removeEventListener('abort', onRequestAbort)
+		})
+
+		if (request.signal.aborted) {
+			onRequestAbort()
+		}
+
+		void produceArchive().catch((error: unknown) => {
+			controller.abort()
+			archive.destroy(error instanceof Error ? error : new Error(getErrorMessage(error)))
+		})
+
 		const exportDate = new Date().toISOString().split('T')[0]
-		return new NextResponse(webStream, {
+
+		return new NextResponse(webStream as ReadableStream<Uint8Array>, {
 			status: 200,
 			headers: new Headers({
 				'content-type': 'application/zip',
 				'content-disposition': `attachment; filename="alkes-export-${exportDate}.zip"`,
-				'Transfer-Encoding': 'chunked',
 			}),
 		})
 	} catch (error: unknown) {

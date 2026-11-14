@@ -153,3 +153,15 @@ export const updateAlkesItemFormOptions = (
 			description: fromDatabase.description,
 		},
 	})
+
+export const serveAlkesFileSchema = z.object({
+	alkesFiles: z
+		.array(
+			z.object({
+				id: alkesIdSchema,
+				file_url: z.string().trim().min(1, { error: 'You are missing some alkes file path' }),
+			}),
+		)
+		.min(1, { error: 'You have to pick at least one alkes' })
+		.max(55, { error: 'You are exceeding the download limit, which is 55 alkes files' }),
+})

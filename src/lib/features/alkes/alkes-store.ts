@@ -59,18 +59,31 @@ export const createAlkesStore = (initialState: AlkesState = defaultInitialState)
 					file_url: item.file_url,
 				}))
 
-				const response = await fetch(`${origin}/serve-file`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ alkesFiles: payload }),
-				})
+				let response: Response
+
+				try {
+					response = await fetch(`${origin}/serve-file`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ alkesFiles: payload }),
+					})
+				} catch {
+					throw new Error('Gagal mengunduh ZIP. Silakan coba lagi.')
+				}
 
 				if (!response.ok) {
 					const errorData = await response.json()
 					throw new Error(errorData.error || errorData.message || 'Gagal membuat ZIP')
 				}
 
-				const blob = await response.blob()
+				let blob: Blob
+
+				try {
+					blob = await response.blob()
+				} catch {
+					throw new Error('Gagal mengunduh ZIP. Salah satu dokumen mungkin tidak tersedia. Silakan coba lagi.')
+				}
+
 				saveAs(blob, `alkes-export-${formatDate(new Date())}.zip`)
 			},
 			exportAlkesToExcel: async (alkesItems) => {
